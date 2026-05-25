@@ -46,7 +46,7 @@ initComponents();
         }
 
         try {
-            String url = "http://localhost:8081/citas/doctor/" + correoDoctor;
+            String url = "http:// 192.168.0.118:8081/citas/doctor/" + correoDoctor;
             String respuesta = ApiCliente.get(url);
 
             // Si la API responde vacío, evitamos que trone el constructor de JSONArray

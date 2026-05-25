@@ -251,7 +251,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
             + "}";
 
     String respuesta = ApiCliente.post(
-            "http://localhost:8081/usuarios/login",
+            "http:// 192.168.0.118:8081/usuarios/login",
             json
     );
 

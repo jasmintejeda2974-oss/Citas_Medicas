@@ -58,7 +58,7 @@ public Notificaciones(int usuarioId, String correo, String rol) {
             }
 
             // 3. Llamada al Backend
-            String url = "http://localhost:8081/notificaciones/usuario/" + usuarioIdGlobal;
+            String url = "http:// 192.168.0.118:8081/notificaciones/usuario/" + usuarioIdGlobal;
             String respuesta = ApiCliente.get(url);
 
             System.out.println("RESPUESTA DESDE EL SERVIDOR: " + respuesta);
