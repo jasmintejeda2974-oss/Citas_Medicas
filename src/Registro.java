@@ -296,7 +296,7 @@ public class Registro extends javax.swing.JFrame {
             String telefono = txtTelefono.getText();
             String direccion = txtDireccion.getText();
             
-            // 🔥 AQUÍ EL CAMBIO: Forzamos que el rol enviado sea estrictamente PACIENTE
+            //  AQUÍ EL CAMBIO: Forzamos que el rol enviado sea estrictamente PACIENTE
             String rol = "PACIENTE"; 
 
             // 4. Armamos el objeto JSON para enviar a la API externa
