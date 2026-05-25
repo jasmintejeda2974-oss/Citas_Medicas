@@ -50,7 +50,7 @@ private void cargarCitas() {
                     paciente = cita.getJSONObject("usuario").optString("nombre", "Desconocido");
                 }
                 
-                // 🛡️ Extracción súper segura del Doctor (evita que la tabla se quede en blanco si es null)
+                // ️ Extracción súper segura del Doctor (evita que la tabla se quede en blanco si es null)
                 String doctor = "No asignado";
                 if (cita.has("doctor") && !cita.isNull("doctor")) {
                     JSONObject docObj = cita.getJSONObject("doctor");
@@ -236,7 +236,7 @@ try {
             }
             int id = Integer.parseInt(txtCitas.getValueAt(fila, 0).toString());
             
-            // 🚀 URL CORREGIDA: /citas/estado/{id}/FINALIZADA
+            //  URL  /citas/estado/{id}/FINALIZADA
             ApiCliente.put("https://shrubs-calzone-decency.ngrok-free.dev/citas/estado/" + id + "/FINALIZADA");
             
             JOptionPane.showMessageDialog(this, "Cita marcada como Finalizada.");
@@ -256,7 +256,7 @@ try {
             }
             int id = Integer.parseInt(txtCitas.getValueAt(fila, 0).toString());
             
-            // 🚀 URL CORREGIDA: /citas/estado/{id}/CANCELADA
+            //  URL  /citas/estado/{id}/CANCELADA
             ApiCliente.put("https://shrubs-calzone-decency.ngrok-free.dev/citas/estado/" + id + "/CANCELADA");
             
             JOptionPane.showMessageDialog(this, "Cita Cancelada con éxito.");
@@ -276,7 +276,7 @@ try {
             }
             int id = Integer.parseInt(txtCitas.getValueAt(fila, 0).toString());
             
-            // 🚀 URL CORREGIDA: /citas/estado/{id}/CONFIRMADA
+            // /citas/estado/{id}/CONFIRMADA
             ApiCliente.put("https://shrubs-calzone-decency.ngrok-free.dev/citas/estado/" + id + "/CONFIRMADA");
             
             JOptionPane.showMessageDialog(this, "¡Cita Confirmada con éxito!");
