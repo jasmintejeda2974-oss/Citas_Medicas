@@ -2,20 +2,97 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
+import javax.swing.JOptionPane;
+import utils.ApiCliente;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import javax.swing.table.DefaultTableModel;
 
-/**
- *
- * @author Jazmín
- */
 public class HistorialPaciente extends javax.swing.JFrame {
+
+     private int usuarioIdGlobal;
+    private String correoPacienteGlobal = "";
 
     /**
      * Creates new form HistorialClinico
      */
     public HistorialPaciente() {
         initComponents();
+        limpiarTabla();
     }
 
+    public HistorialPaciente(int idDoctor, String correoDoc) {
+        initComponents();
+        this.usuarioIdGlobal = idDoctor;
+        // Al guardar el correo del doctor aquí, el botón Volver sabrá a dónde regresar
+        this.correoPacienteGlobal = correoDoc; 
+        limpiarTabla();
+    }
+ public HistorialPaciente(String correoPaciente) {
+        initComponents();
+        this.correoPacienteGlobal = correoPaciente;
+        // Colocamos el correo en el buscador automáticamente si ya lo conocemos
+        txtCorreoBuscar.setText(correoPaciente);
+        cargarHistorial(correoPaciente);
+    }
+    
+
+ public void cargarHistorial(String correoTarget) {
+    // Control de seguridad: si el campo está vacío, detenemos la petición
+    if (correoTarget == null || correoTarget.trim().isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Por favor, introduce un correo válido para buscar.");
+        return;
+    }
+
+    try {
+        // 🏥 Cambiamos el endpoint para apuntar al controlador del historial/antecedentes
+        String url = "http://localhost:8081/historial/usuario/correo/" + correoTarget.trim();
+        String respuesta = ApiCliente.get(url);
+
+        DefaultTableModel model = (DefaultTableModel) THistorial.getModel();
+        model.setRowCount(0); // Reseteamos la tabla siempre antes de buscar
+
+        // Si el backend responde vacío o da error porque el paciente no tiene historial clínico creado aún
+        if (respuesta == null || respuesta.trim().isEmpty() || respuesta.startsWith("Error")) {
+            JOptionPane.showMessageDialog(this, "El paciente con correo '" + correoTarget + "' aún no tiene un historial clínico registrado.");
+            return;
+        }
+
+        // 💡 Como un usuario solo tiene UN historial clínico único, el backend devuelve un OBJECT {} no un ARRAY []
+        JSONObject obj = new JSONObject(respuesta);
+
+        // Extraemos de forma segura cada propiedad mapeándola con las columnas nuevas
+        String tipoSangre = obj.optString("tipoSangre", "No registrado");
+        String alergias = obj.optString("alergias", "Ninguna");
+        String antecedentes = obj.optString("antecedentes", "Ninguno");
+        String enfermedades = obj.optString("enfermedadesCronicas", "Ninguna");
+        String medicamentos = obj.optString("medicamentos", "Ninguno");
+
+        // Agregamos la fila con los datos clínicos reales del paciente
+        model.addRow(new Object[]{
+            tipoSangre,
+            alergias,
+            antecedentes,
+            enfermedades,
+            medicamentos
+        });
+
+    } catch (Exception e) {
+        e.printStackTrace();
+        // Si el servidor arroja un 404 (FileNotFoundException), significa que el registro no existe
+        if (e.toString().contains("FileNotFoundException")) {
+            JOptionPane.showMessageDialog(this, "No se encontró historial clínico para este correo. Verifique si el paciente ya lo registró.");
+        } else {
+            JOptionPane.showMessageDialog(this, "Error al comunicar con el servidor de historiales médicos.");
+        }
+        limpiarTabla();
+    }
+}
+
+    private void limpiarTabla() {
+        DefaultTableModel model = (DefaultTableModel) THistorial.getModel();
+        model.setRowCount(0);
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -30,11 +107,11 @@ public class HistorialPaciente extends javax.swing.JFrame {
         jLabel10 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        THistorial = new javax.swing.JTable();
         jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
         btnVolver = new javax.swing.JButton();
-        btnVerDetalles = new javax.swing.JButton();
+        txtCorreoBuscar = new javax.swing.JTextField();
+        btnBuscar = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -43,36 +120,35 @@ public class HistorialPaciente extends javax.swing.JFrame {
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel1.setText("HISTORIAL DE CITAS");
-
-        jLabel10.setIcon(new javax.swing.ImageIcon("C:\\Users\\Jazmín\\Desktop\\Programacion\\Citas_medicas\\src\\img\\cita-medica.png")); // NOI18N
+        jLabel1.setText("ANTECEDENTES DEL PACIENTE");
 
         javax.swing.GroupLayout JPInicioLayout = new javax.swing.GroupLayout(JPInicio);
         JPInicio.setLayout(JPInicioLayout);
         JPInicioLayout.setHorizontalGroup(
             JPInicioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(JPInicioLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 201, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(45, 45, 45)
+                .addGap(174, 174, 174)
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 267, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabel10)
                 .addGap(31, 31, 31))
         );
         JPInicioLayout.setVerticalGroup(
             JPInicioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(JPInicioLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(JPInicioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(JPInicioLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jLabel10, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(JPInicioLayout.createSequentialGroup()
+                        .addGap(44, 44, 44)
+                        .addComponent(jLabel1)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, JPInicioLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabel1)
-                .addGap(40, 40, 40))
         );
 
         jPanel1.setBackground(new java.awt.Color(102, 153, 255));
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        THistorial.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null},
                 {null, null, null, null, null},
@@ -80,14 +156,12 @@ public class HistorialPaciente extends javax.swing.JFrame {
                 {null, null, null, null, null}
             },
             new String [] {
-                "FECHA:", "HORA:", "DOCTOR:", "ESPECIALIDAD:", "ESTADO:"
+                "TIPO DE SANGRE:", "ALERGIAS:", "ANTECEDENTES:", "ENFERMEDADES CRONICAS:", "MEDICAMENTOS:"
             }
         ));
-        jScrollPane1.setViewportView(jTable1);
+        jScrollPane1.setViewportView(THistorial);
 
         jLabel2.setText("PACIENTE:");
-
-        jLabel3.setText("JASMIN");
 
         btnVolver.setText("VOLVER");
         btnVolver.addActionListener(new java.awt.event.ActionListener() {
@@ -96,40 +170,44 @@ public class HistorialPaciente extends javax.swing.JFrame {
             }
         });
 
-        btnVerDetalles.setText("VER DETALLES");
+        btnBuscar.setText("BUSCAR");
+        btnBuscar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBuscarActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(168, 168, 168)
+                .addGap(59, 59, 59)
                 .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+                .addComponent(txtCorreoBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, 223, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 192, Short.MAX_VALUE)
+                .addComponent(btnBuscar)
+                .addGap(21, 21, 21))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(btnVerDetalles)
-                .addGap(50, 50, 50)
                 .addComponent(btnVolver, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(128, 128, 128))
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 503, Short.MAX_VALUE)
+                .addGap(274, 274, 274))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(24, 24, 24)
+                .addGap(21, 21, 21)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
-                    .addComponent(jLabel3))
-                .addGap(31, 31, 31)
+                    .addComponent(txtCorreoBuscar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnBuscar))
+                .addGap(27, 27, 27)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 166, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnVerDetalles, javax.swing.GroupLayout.PREFERRED_SIZE, 44, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnVolver, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(43, 43, 43))
+                .addComponent(btnVolver, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(44, 44, 44))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -137,7 +215,7 @@ public class HistorialPaciente extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(JPInicio, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -152,8 +230,33 @@ public class HistorialPaciente extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnVolverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVolverActionPerformed
-        // TODO add your handling code here:
+try {
+        // 🔍 REVISIÓN INTELIGENTE DE ROL: 
+        // Si el correo contiene la palabra doctor o si vino del constructor de doctor (donde idDoctor se guarda en usuarioIdGlobal)
+        // Pero para asegurar, si entramos desde el MenuPaciente, el idDoctor se queda en 0.
+        if (this.usuarioIdGlobal > 0) {
+            // Si tiene ID de doctor asignado, regresa al menú del doctor
+            MenuDoctor md = new MenuDoctor(this.usuarioIdGlobal, this.correoPacienteGlobal); 
+            md.setVisible(true);
+        } else {
+            // 🚀 SI ES PACIENTE: Regresa directo a su menú correspondiente pasándole sus datos reales
+            // Usamos el ID 0 temporal o el id global si lo tuvieras, y el correo que cargó la pantalla
+            MenuPaciente mp = new MenuPaciente(0, this.correoPacienteGlobal);
+            mp.setVisible(true);
+        }
+        this.dispose();
+    } catch (Exception e) {
+        // Protección por si algo falla, regresa al Login para no congelar el software
+        MenuPrincipal mp = new MenuPrincipal();
+        mp.setVisible(true);
+        this.dispose();
+    }
     }//GEN-LAST:event_btnVolverActionPerformed
+
+    private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
+    String correoABuscar = txtCorreoBuscar.getText();
+        cargarHistorial(correoABuscar);
+    }//GEN-LAST:event_btnBuscarActionPerformed
 
     /**
      * @param args the command line arguments
@@ -199,14 +302,14 @@ public class HistorialPaciente extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel JPInicio;
-    private javax.swing.JButton btnVerDetalles;
+    private javax.swing.JTable THistorial;
+    private javax.swing.JButton btnBuscar;
     private javax.swing.JButton btnVolver;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JTextField txtCorreoBuscar;
     // End of variables declaration//GEN-END:variables
 }

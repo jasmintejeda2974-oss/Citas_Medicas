@@ -284,11 +284,6 @@
           </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel10">
-          <Properties>
-            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-              <Image iconType="2" name="C:\Users\Jazm&#xed;n\Desktop\Programacion\Citas_medicas\src\img\cita-medica.png"/>
-            </Property>
-          </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="jLabel11">
           <Properties>
@@ -299,9 +294,9 @@
           <Properties>
             <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
               <StringArray count="3">
-                <StringItem index="0" value="Paciente"/>
-                <StringItem index="1" value="Doctor"/>
-                <StringItem index="2" value="Administrador"/>
+                <StringItem index="0" value="PACIENTE"/>
+                <StringItem index="1" value="DOCTOR"/>
+                <StringItem index="2" value="ADMIN"/>
               </StringArray>
             </Property>
           </Properties>

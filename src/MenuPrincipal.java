@@ -9,7 +9,10 @@
  */
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import utils.ApiCliente;
+
 public class MenuPrincipal extends javax.swing.JFrame {
 
     /**
@@ -17,9 +20,9 @@ public class MenuPrincipal extends javax.swing.JFrame {
      */
     public MenuPrincipal() {
         initComponents();
-
-        setIconImage(new ImageIcon(getClass().getResource("/img/ico.png")).getImage());
+        //setIconImage(new ImageIcon(getClass().getResource("/img/ico.png")).getImage());
     }
+   
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -38,7 +41,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
         jLabel6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
         txtUsuario = new javax.swing.JTextField();
-        cmbRol = new javax.swing.JButton();
+        btnLogin = new javax.swing.JButton();
         jLabel8 = new javax.swing.JLabel();
         txtContraseña = new javax.swing.JTextField();
         btnCerrarSesion = new javax.swing.JButton();
@@ -87,20 +90,23 @@ public class MenuPrincipal extends javax.swing.JFrame {
 
         jLabel7.setText("CONTRASEÑA:");
 
-        cmbRol.setText("INICIAR SESIÓN");
-        cmbRol.addActionListener(new java.awt.event.ActionListener() {
+        btnLogin.setText("INICIAR SESIÓN");
+        btnLogin.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cmbRolActionPerformed(evt);
+                btnLoginActionPerformed(evt);
             }
         });
 
-        jLabel8.setIcon(new javax.swing.ImageIcon("C:\\Users\\Jazmín\\Desktop\\Programacion\\Citas_medicas\\src\\img\\cita-medica.png")); // NOI18N
-
         btnCerrarSesion.setText("CERRAR SESIÓN");
+        btnCerrarSesion.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCerrarSesionActionPerformed(evt);
+            }
+        });
 
         jLabel9.setText("ROL:");
 
-        bmRol.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Paciente", "Doctor", "Administrador" }));
+        bmRol.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "PACIENTE", "DOCTOR", "ADMIN" }));
 
         javax.swing.GroupLayout JPContenidoLayout = new javax.swing.GroupLayout(JPContenido);
         JPContenido.setLayout(JPContenidoLayout);
@@ -119,7 +125,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
                 .addContainerGap())
             .addGroup(JPContenidoLayout.createSequentialGroup()
                 .addGap(40, 40, 40)
-                .addComponent(cmbRol)
+                .addComponent(btnLogin)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 73, Short.MAX_VALUE)
                 .addComponent(btnCerrarSesion)
                 .addGap(17, 17, 17))
@@ -162,7 +168,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
                     .addComponent(bmRol, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 55, Short.MAX_VALUE)
                 .addGroup(JPContenidoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(cmbRol)
+                    .addComponent(btnLogin)
                     .addComponent(btnCerrarSesion))
                 .addGap(52, 52, 52))
         );
@@ -230,19 +236,13 @@ public class MenuPrincipal extends javax.swing.JFrame {
 
     private void btnRegistrarmeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistrarmeActionPerformed
         Registro registro = new Registro();
-
         registro.setVisible(true);
-
         this.dispose();
     }//GEN-LAST:event_btnRegistrarmeActionPerformed
 
-    private void cmbRolActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cmbRolActionPerformed
- 
-
+    private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLoginActionPerformed
     String correo = txtUsuario.getText();
-
     String password = txtContraseña.getText();
-
     String rol = bmRol.getSelectedItem().toString();
 
     String json = "{"
@@ -251,47 +251,66 @@ public class MenuPrincipal extends javax.swing.JFrame {
             + "}";
 
     String respuesta = ApiCliente.post(
-            "http://10.5.1.117:8081/usuarios/login",
+            "http://localhost:8081/usuarios/login",
             json
     );
 
-    System.out.println(respuesta);
+   System.out.println("LOGIN RESPONSE: " + respuesta);
 
-    if (respuesta != null && respuesta.contains("\"rol\":\"" + rol + "\"")) {
+if (respuesta != null && respuesta.contains("\"rol\":\"" + rol + "\"")) {
+
+    try {
+
+        JSONObject obj = new JSONObject(respuesta);
+
+        // 🔥 AQUÍ SE OBTIENE EL ID (ESTO ES LO IMPORTANTE)
+        int usuarioId = obj.getInt("id");
 
         JOptionPane.showMessageDialog(this, "Bienvenido");
 
         if (rol.equals("ADMIN")) {
 
-            MenuAdministrador admin = new MenuAdministrador();
-
-            admin.setVisible(true);
+            new MenuAdministrador().setVisible(true);
 
         } else if (rol.equals("DOCTOR")) {
 
-            MenuDoctor doctor = new MenuDoctor();
-
-            doctor.setVisible(true);
+            // 👇 AQUÍ VA LO QUE PREGUNTAS
+            new MenuDoctor(usuarioId, correo).setVisible(true);
 
         } else {
 
-            MenuPaciente paciente = new MenuPaciente();
-
-            paciente.setVisible(true);
+            // 👇 AQUÍ TAMBIÉN
+            new MenuPaciente(usuarioId, correo).setVisible(true);
         }
 
         this.dispose();
 
-    } else {
-
-        JOptionPane.showMessageDialog(
-                this,
-                "Datos incorrectos"
-        );
+    } catch (Exception e) {
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Error al leer usuario");
     }
 
+} else {
+    JOptionPane.showMessageDialog(this, "Datos incorrectos");
+}
+    }//GEN-LAST:event_btnLoginActionPerformed
 
-    }//GEN-LAST:event_cmbRolActionPerformed
+    private void btnCerrarSesionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCerrarSesionActionPerformed
+    // 1. Mostramos un mensaje de confirmación al usuario
+    int opcion = javax.swing.JOptionPane.showConfirmDialog(
+        this, 
+        "¿Estás seguro de que deseas cerrar sesión y salir del sistema?", 
+        "Salir del Programa", 
+        javax.swing.JOptionPane.YES_NO_OPTION,
+        javax.swing.JOptionPane.QUESTION_MESSAGE
+    );
+    
+    // 2. Si el usuario responde que SÍ (opción YES_OPTION)
+    if (opcion == javax.swing.JOptionPane.YES_OPTION) {
+        // Cierra todas las ventanas abiertas y mata el proceso de Java por completo
+        System.exit(0); 
+    }
+    }//GEN-LAST:event_btnCerrarSesionActionPerformed
 
     /**
      * @param args the command line arguments
@@ -333,8 +352,8 @@ public class MenuPrincipal extends javax.swing.JFrame {
     private javax.swing.JPanel JPInicio;
     private javax.swing.JComboBox<String> bmRol;
     private javax.swing.JButton btnCerrarSesion;
+    private javax.swing.JButton btnLogin;
     private javax.swing.JButton btnRegistrarme;
-    private javax.swing.JButton cmbRol;
     private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel3;

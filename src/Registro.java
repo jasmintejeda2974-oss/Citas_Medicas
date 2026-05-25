@@ -18,7 +18,7 @@ public class Registro extends javax.swing.JFrame {
      */
     public Registro() {
         initComponents();
-        setIconImage(new ImageIcon(getClass().getResource("/img/ico.png")).getImage());
+       // setIconImage(new ImageIcon(getClass().getResource("/img/ico.png")).getImage());
     }
 
     /**
@@ -142,11 +142,9 @@ public class Registro extends javax.swing.JFrame {
 
         jLabel9.setText("CONFIRMAR");
 
-        jLabel10.setIcon(new javax.swing.ImageIcon("C:\\Users\\Jazmín\\Desktop\\Programacion\\Citas_medicas\\src\\img\\cita-medica.png")); // NOI18N
-
         jLabel11.setText("ROL:");
 
-        cmbRol.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Paciente", "Doctor", "Administrador" }));
+        cmbRol.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "PACIENTE", "DOCTOR", "ADMIN" }));
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -315,7 +313,7 @@ public class Registro extends javax.swing.JFrame {
                     + "}";
 
             String respuesta = ApiCliente.post(
-                    "http://10.5.1.117:8081/usuarios",
+                    "http://localhost:8081/usuarios",
                     json
             );
 

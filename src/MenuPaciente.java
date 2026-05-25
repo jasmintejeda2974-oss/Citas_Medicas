@@ -1,5 +1,7 @@
 
 import javax.swing.ImageIcon;
+import org.json.JSONObject;
+import utils.ApiCliente;
 
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
@@ -11,12 +13,71 @@ import javax.swing.ImageIcon;
  */
 public class MenuPaciente extends javax.swing.JFrame {
 
+    private String correoPacienteGlobal;
+    private String usuarioLogueado = "";
+    private int usuarioIdGlobal;
+
     /**
      * Creates new form MenuPaciente
      */
     public MenuPaciente() {
         initComponents();
-        setIconImage(new ImageIcon(getClass().getResource("/img/ico.png")).getImage());
+        //setIconImage(new ImageIcon(getClass().getResource("/img/ico.png")).getImage());
+    }
+
+    public MenuPaciente(int usuarioId, String correo) {
+        initComponents();
+
+        this.usuarioIdGlobal = usuarioId;
+        this.correoPacienteGlobal = correo;
+        this.usuarioLogueado = correo;
+
+        System.out.println("MENU PACIENTE ID: " + usuarioIdGlobal);
+
+        cargarProximaCita();
+    }
+
+    // 2. Creamos un segundo constructor que reciba el correo desde el Login
+    private void cargarProximaCita() {
+
+        try {
+
+            String respuesta = ApiCliente.get(
+                    "http://localhost:8081/citas/proxima/" + correoPacienteGlobal
+            );
+
+            System.out.println("RESPUESTA: " + respuesta);
+
+            if (respuesta == null
+                    || respuesta.trim().isEmpty()
+                    || respuesta.trim().equals("null")) {
+
+                lblProximacita.setText("Aquí se mostrará cuando se aproxime una cita");
+                return;
+            }
+
+            JSONObject json = new JSONObject(respuesta);
+
+            String fecha = json.getString("fecha");
+
+            JSONObject doctor = json.getJSONObject("doctor");
+            JSONObject usuarioDoctor = doctor.getJSONObject("usuario");
+            String nombreDoctor = usuarioDoctor.getString("nombre");
+
+            String texto
+                    = "<html>"
+                    + "📅 Próxima cita:<br>"
+                    + "🕒 " + fecha + "<br>"
+                    + "👨‍⚕️ " + nombreDoctor
+                    + "</html>";
+
+            lblProximacita.setText(texto);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+
+            lblProximacita.setText("Aquí se mostrará cuando se aproxime una cita");
+        }
     }
 
     /**
@@ -33,15 +94,15 @@ public class MenuPaciente extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         btnAgendar = new javax.swing.JButton();
         btnHistorial = new javax.swing.JButton();
-        btnPerfil = new javax.swing.JButton();
         btnCerrarSesion = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
+        btnNotificacion = new javax.swing.JButton();
+        brnAntecedentes = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
+        lblProximacita = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
-        jLabel7 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -76,17 +137,10 @@ public class MenuPaciente extends javax.swing.JFrame {
             }
         });
 
-        btnHistorial.setText("HISTORIAL");
+        btnHistorial.setText("HISTORIAL DE CITAS");
         btnHistorial.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnHistorialActionPerformed(evt);
-            }
-        });
-
-        btnPerfil.setText("PERFIL");
-        btnPerfil.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnPerfilActionPerformed(evt);
             }
         });
 
@@ -100,46 +154,62 @@ public class MenuPaciente extends javax.swing.JFrame {
         jLabel2.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         jLabel2.setText("MENÚ");
 
+        btnNotificacion.setText("Notificaciones");
+        btnNotificacion.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnNotificacionActionPerformed(evt);
+            }
+        });
+
+        brnAntecedentes.setText("ANTECEDENTES CLINICOS");
+        brnAntecedentes.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                brnAntecedentesActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(btnAgendar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(btnHistorial, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnPerfil, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(btnCerrarSesion, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(8, 8, 8)))
-                .addContainerGap(14, Short.MAX_VALUE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(21, 21, 21)
+                        .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(brnAntecedentes, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnAgendar, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(btnNotificacion)
+                .addGap(35, 35, 35))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(29, 29, 29)
                 .addComponent(jLabel2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 34, Short.MAX_VALUE)
-                .addComponent(btnAgendar, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btnAgendar, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
                 .addComponent(btnHistorial, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnPerfil, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btnCerrarSesion, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(21, 21, 21))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 13, Short.MAX_VALUE)
+                .addComponent(brnAntecedentes, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(btnNotificacion)
+                .addGap(16, 16, 16))
         );
-
-        jLabel3.setIcon(new javax.swing.ImageIcon("C:\\Users\\Jazmín\\Desktop\\Programacion\\Citas_medicas\\src\\img\\cita-medica.png")); // NOI18N
 
         jLabel4.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         jLabel4.setText("NOTIFICACIONES");
 
-        jLabel5.setText("• Próxima cita");
-
-        jLabel7.setText("• Tiene una cita el dia");
+        lblProximacita.setText("Entra para ver lo nuevo en tus citas");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -150,16 +220,15 @@ public class MenuPaciente extends javax.swing.JFrame {
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jLabel3))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel2Layout.createSequentialGroup()
                         .addGap(45, 45, 45)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addGroup(jPanel2Layout.createSequentialGroup()
                                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGap(0, 70, Short.MAX_VALUE)))))
+                                    .addComponent(lblProximacita, javax.swing.GroupLayout.PREFERRED_SIZE, 203, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(0, 13, Short.MAX_VALUE)))))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
@@ -168,12 +237,10 @@ public class MenuPaciente extends javax.swing.JFrame {
                 .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(36, 36, 36)
-                .addComponent(jLabel5)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lblProximacita)
+                .addGap(48, 48, 48)
                 .addComponent(jLabel6)
-                .addGap(18, 18, 18)
-                .addComponent(jLabel7)
                 .addGap(0, 0, Short.MAX_VALUE))
         );
 
@@ -193,8 +260,8 @@ public class MenuPaciente extends javax.swing.JFrame {
                 .addComponent(JPInicio, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
 
         pack();
@@ -202,35 +269,38 @@ public class MenuPaciente extends javax.swing.JFrame {
 
     private void btnCerrarSesionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCerrarSesionActionPerformed
         MenuPrincipal menu = new MenuPrincipal();
-
         menu.setVisible(true);
-
         this.dispose();
     }//GEN-LAST:event_btnCerrarSesionActionPerformed
 
     private void btnAgendarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgendarActionPerformed
-        AgendarCita cita = new AgendarCita();
-
+        AgendarCita cita = new AgendarCita(this.usuarioLogueado);
         cita.setVisible(true);
-
         this.dispose();
+
     }//GEN-LAST:event_btnAgendarActionPerformed
 
     private void btnHistorialActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHistorialActionPerformed
-        HistorialPaciente historial = new HistorialPaciente();
-
-        historial.setVisible(true);
-
-        this.dispose();
+HistorialcitasPaciente pantallaCitas = new HistorialcitasPaciente(this.correoPacienteGlobal);
+    pantallaCitas.setVisible(true);
+    this.dispose(); // Cerramos el menú
     }//GEN-LAST:event_btnHistorialActionPerformed
 
-    private void btnPerfilActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPerfilActionPerformed
-        PerfilPaciente perfil = new PerfilPaciente();
-
-        perfil.setVisible(true);
-
+    private void btnNotificacionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNotificacionActionPerformed
+        Notificaciones n = new Notificaciones(this.usuarioIdGlobal, this.correoPacienteGlobal);
+        n.setVisible(true);
         this.dispose();
-    }//GEN-LAST:event_btnPerfilActionPerformed
+    }//GEN-LAST:event_btnNotificacionActionPerformed
+
+    private void brnAntecedentesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_brnAntecedentesActionPerformed
+// Imprime en consola para verificar qué ID tiene el menú antes de abrir la ventana
+    System.out.println("Abriendo antecedentes con el ID de usuario: " + this.usuarioIdGlobal);
+
+    AntecedentesPaciente ap = new AntecedentesPaciente(this.usuarioIdGlobal, this.correoPacienteGlobal);
+    ap.setVisible(true);
+    ap.setLocationRelativeTo(null);
+    this.dispose();
+    }//GEN-LAST:event_brnAntecedentesActionPerformed
 
     /**
      * @param args the command line arguments
@@ -269,18 +339,18 @@ public class MenuPaciente extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel JPInicio;
+    private javax.swing.JButton brnAntecedentes;
     private javax.swing.JButton btnAgendar;
     private javax.swing.JButton btnCerrarSesion;
     private javax.swing.JButton btnHistorial;
-    private javax.swing.JButton btnPerfil;
+    private javax.swing.JButton btnNotificacion;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JLabel lblProximacita;
     // End of variables declaration//GEN-END:variables
 }

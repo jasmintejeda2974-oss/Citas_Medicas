@@ -7,13 +7,135 @@
  *
  * @author Jazmín
  */
+import utils.ApiCliente;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import java.util.ArrayList;
+import javax.swing.JOptionPane;
+import utils.CargarDatos;
+
 public class AgendarCita extends javax.swing.JFrame {
+
+    private int usuarioIdGlobal;
+    private String correoPacienteGlobal = "";
 
     /**
      * Creates new form AgendarCita
      */
     public AgendarCita() {
         initComponents();
+    }
+
+    // Constructor con Parámetro (El que usa tu MenuPaciente)
+// Constructor con Parámetro
+// Constructor con Parámetro (El que usa tu MenuPaciente)
+    public AgendarCita(String correoPaciente) {
+        initComponents();
+        this.correoPacienteGlobal = correoPaciente;
+        lblPaciente.setText(correoPaciente);
+
+        // =========================
+        // CARGAR SINTOMAS
+        // =========================
+        CargarDatos.cargarSintomas(cbSintoma);
+
+        // =========================
+        // CARGAR ESPECIALIDADES
+        // =========================
+        CargarDatos.cargarEspecialidades(cbEspecialidad);
+
+        // =========================
+        // SELECCIONAR PRIMERA
+        // =========================
+        if (cbEspecialidad.getItemCount() > 0) {
+
+            cbEspecialidad.setSelectedIndex(0);
+
+            // FORZAR CARGA
+            CargarDatos.cargarDoctoresPorEspecialidad(
+                    cbEspecialidad,
+                    cbDoctor
+            );
+            // 1. Limpiamos los ítems manuales que se pusieron en el diseño
+            cbFecha.removeAllItems();
+
+            // 2. Obtenemos la fecha de hoy usando la API de Java 8+
+            java.time.LocalDate hoy = java.time.LocalDate.now();
+
+            // 3. Agregamos de forma automática el día de hoy y los siguientes 3 días
+            for (int i = 0; i < 4; i++) {
+                cbFecha.addItem(hoy.plusDays(i).toString());
+            }
+        }
+
+        // =========================
+        // HORAS
+        // =========================
+        CargarDatos.cargarHorasDisponibles(
+                cbDoctor,
+                cbFecha,
+                cbHora
+        );
+
+        // =========================
+        // EVENTO ESPECIALIDAD
+        // =========================
+        cbEspecialidad.addActionListener(
+                new java.awt.event.ActionListener() {
+
+            public void actionPerformed(
+                    java.awt.event.ActionEvent evt
+            ) {
+
+                CargarDatos.cargarDoctoresPorEspecialidad(
+                        cbEspecialidad,
+                        cbDoctor
+                );
+
+                CargarDatos.cargarHorasDisponibles(
+                        cbDoctor,
+                        cbFecha,
+                        cbHora
+                );
+            }
+        });
+
+        // =========================
+        // EVENTO DOCTOR
+        // =========================
+        cbDoctor.addActionListener(
+                new java.awt.event.ActionListener() {
+
+            public void actionPerformed(
+                    java.awt.event.ActionEvent evt
+            ) {
+
+                CargarDatos.cargarHorasDisponibles(
+                        cbDoctor,
+                        cbFecha,
+                        cbHora
+                );
+            }
+        });
+
+        // =========================
+        // EVENTO FECHA
+        // =========================
+        cbFecha.addActionListener(
+                new java.awt.event.ActionListener() {
+
+            public void actionPerformed(
+                    java.awt.event.ActionEvent evt
+            ) {
+
+                CargarDatos.cargarHorasDisponibles(
+                        cbDoctor,
+                        cbFecha,
+                        cbHora
+                );
+            }
+        });
+        CargarDatos.cargarHorasDisponibles(cbDoctor, cbFecha, cbHora);
     }
 
     /**
@@ -33,17 +155,16 @@ public class AgendarCita extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
-        jComboBox1 = new javax.swing.JComboBox<>();
-        jComboBox2 = new javax.swing.JComboBox<>();
-        jComboBox3 = new javax.swing.JComboBox<>();
+        lblPaciente = new javax.swing.JLabel();
+        cbEspecialidad = new javax.swing.JComboBox<>();
+        cbDoctor = new javax.swing.JComboBox<>();
+        cbFecha = new javax.swing.JComboBox<>();
         jLabel7 = new javax.swing.JLabel();
-        jComboBox4 = new javax.swing.JComboBox<>();
+        cbHora = new javax.swing.JComboBox<>();
         jLabel8 = new javax.swing.JLabel();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
+        btnAgendarCita = new javax.swing.JButton();
+        btnVolver = new javax.swing.JButton();
+        cbSintoma = new javax.swing.JComboBox<>();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -71,8 +192,6 @@ public class AgendarCita extends javax.swing.JFrame {
                 .addContainerGap(14, Short.MAX_VALUE))
         );
 
-        jLabel10.setIcon(new javax.swing.ImageIcon("C:\\Users\\Jazmín\\Desktop\\Programacion\\Citas_medicas\\src\\img\\cita-medica.png")); // NOI18N
-
         jLabel2.setText("Paciente:");
 
         jLabel3.setText("Especialidad:");
@@ -81,27 +200,33 @@ public class AgendarCita extends javax.swing.JFrame {
 
         jLabel5.setText("Fecha:");
 
-        jLabel6.setText("jLabel6");
+        lblPaciente.setText("nombre");
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Medicina General", "Pediatría", "Cardiología", "Dermatología", "Ginecología", "Neurología", "Traumatología", "Oftalmología", "Odontología", "Psiquiatría", "Psicología", "Nutrición", "Urología", "Endocrinología", "Otorrinolaringología", "Oncología", "Neumología", "Gastroenterología", "Reumatología", "Cirugía General", "Medicina Interna", "Anestesiología", "Radiología", "Nefrología", "Infectología" }));
-
-        jComboBox2.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-
-        jComboBox3.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        cbEspecialidad.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cbEspecialidadActionPerformed(evt);
+            }
+        });
 
         jLabel7.setText("Hora:");
 
-        jComboBox4.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jLabel8.setText("Sintoma:");
 
-        jLabel8.setText("Motivo:");
+        btnAgendarCita.setText("AGENDAR CITA");
+        btnAgendarCita.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAgendarCitaActionPerformed(evt);
+            }
+        });
 
-        jTextArea1.setColumns(20);
-        jTextArea1.setRows(5);
-        jScrollPane1.setViewportView(jTextArea1);
+        btnVolver.setText("VOLVER");
+        btnVolver.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnVolverActionPerformed(evt);
+            }
+        });
 
-        jButton1.setText("AGENDAR CITA");
-
-        jButton2.setText("VOLVER");
+        cbSintoma.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -118,21 +243,21 @@ public class AgendarCita extends javax.swing.JFrame {
                     .addComponent(jLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addComponent(jComboBox4, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(cbHora, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel10)
                         .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jComboBox1, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jComboBox2, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jComboBox3, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(lblPaciente, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(cbEspecialidad, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(cbDoctor, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(cbFecha, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(cbSintoma, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(29, 29, 29))
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(83, 83, 83)
-                .addComponent(jButton1)
+                .addComponent(btnAgendarCita)
                 .addGap(18, 18, 18)
-                .addComponent(jButton2)
+                .addComponent(btnVolver)
                 .addContainerGap(104, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
@@ -143,34 +268,31 @@ public class AgendarCita extends javax.swing.JFrame {
                 .addGap(32, 32, 32)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jLabel2)
-                    .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, 22, Short.MAX_VALUE))
+                    .addComponent(lblPaciente, javax.swing.GroupLayout.DEFAULT_SIZE, 22, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel3)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(cbEspecialidad, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4)
-                    .addComponent(jComboBox2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(cbDoctor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(29, 29, 29)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
-                    .addComponent(jComboBox3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(cbFecha, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel7)
-                    .addComponent(jComboBox4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(37, 37, 37)
-                        .addComponent(jLabel8))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(18, 18, 18)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 186, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 26, Short.MAX_VALUE)
+                    .addComponent(cbHora, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(34, 34, 34)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton1)
-                    .addComponent(jButton2))
+                    .addComponent(jLabel8)
+                    .addComponent(cbSintoma, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 174, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnAgendarCita)
+                    .addComponent(btnVolver))
                 .addGap(15, 15, 15))
         );
 
@@ -192,6 +314,176 @@ public class AgendarCita extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btnAgendarCitaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgendarCitaActionPerformed
+     try {
+
+            if (cbDoctor.getSelectedItem() == null
+                    || cbSintoma.getSelectedItem() == null) {
+
+                JOptionPane.showMessageDialog(
+                        this,
+                        "Selecciona doctor y síntoma"
+                );
+
+                return;
+            }
+
+            // =========================
+            // HORA
+            // =========================
+            String hora
+                    = cbHora.getSelectedItem().toString();
+
+            if (hora.length() == 7) {
+                hora = "0" + hora;
+            }
+
+            String fecha
+                    = cbFecha.getSelectedItem().toString()
+                    + "T"
+                    + hora;
+
+            // =========================
+            // OBTENER PACIENTE REAL
+            // =========================
+            String respuestaUsuario
+                    = ApiCliente.get(
+                            "http://localhost:8081/usuarios/correo/"
+                            + correoPacienteGlobal
+                    );
+
+            JSONObject usuarioJson
+                    = new JSONObject(respuestaUsuario);
+
+            int idUsuario
+                    = usuarioJson.getInt("id");
+
+            // =========================
+            // OBTENER DOCTOR
+            // =========================
+            String docSel
+                    = cbDoctor.getSelectedItem().toString();
+
+            int idDoctor
+                    = Integer.parseInt(
+                            docSel.split(" - ")[0]
+                    );
+
+            // =========================
+            // OBTENER SINTOMA
+            // =========================
+            String seleccionado
+                    = cbSintoma.getSelectedItem().toString();
+
+            int idSintoma
+                    = Integer.parseInt(
+                            seleccionado.split(" - ")[0]
+                    );
+
+            // =========================
+            // JSON CITA
+            // =========================
+            String json = "{"
+                    + "\"fecha\":\"" + fecha + "\","
+                    + "\"usuario\":{\"id\":" + idUsuario + "},"
+                    + "\"doctor\":{\"id\":" + idDoctor + "},"
+                    + "\"sintoma\":{\"id\":" + idSintoma + "}"
+                    + "}";
+
+            // =========================
+            // GUARDAR CITA
+            // =========================
+            String respuesta
+                    = ApiCliente.post(
+                            "http://localhost:8081/citas",
+                            json
+                    );
+
+            System.out.println(respuesta);
+
+            // ========================================================
+            // 🌟 NOTIFICACIONES AUTOMÁTICAS REPARADAS
+            // ========================================================
+            JSONObject citaCreadaJson = new JSONObject(respuesta);
+            int idCitaRecienCreada = citaCreadaJson.getInt("id");
+            String fechaNotif = java.time.LocalDateTime.now().toString();
+
+            // --- NOTIFICACIÓN 1: Al Paciente ---
+            String jsonNotifPaciente = "{"
+                    + "\"fecha\":\"" + fechaNotif + "\","
+                    + "\"mensaje\":\"Tu cita médica ha sido agendada con éxito.\","
+                    + "\"cita\":{\"id\":" + idCitaRecienCreada + "},"
+                    + "\"usuario\":{\"id\":" + idUsuario + "}"
+                    + "}";
+            ApiCliente.post("http://localhost:8081/notificaciones", jsonNotifPaciente);
+
+            // --- NOTIFICACIÓN 2: Al Doctor asignado (CORREGIDO CON EL ID DE USUARIO REAL) ---
+            // Traducimos el idDoctor (ej: 8) al usuario_id real del Login (ej: 18)
+            int idUsuarioRealDelDoctor = obtenerUsuarioIdDelDoctor(idDoctor);
+
+            String jsonNotifDoctor = "{"
+                    + "\"fecha\":\"" + fechaNotif + "\","
+                    + "\"mensaje\":\"Tienes una nueva cita asignada con el paciente: " + correoPacienteGlobal + "\","
+                    + "\"cita\":{\"id\":" + idCitaRecienCreada + "},"
+                    + "\"usuario\":{\"id\":" + idUsuarioRealDelDoctor + "}" // 🥼 ¡Ahora sí apunta a su cuenta!
+                    + "}";
+            ApiCliente.post("http://localhost:8081/notificaciones", jsonNotifDoctor);
+
+            // --- NOTIFICACIÓN 3: Al Administrador ---
+            int idAdministrador = 1;
+            String jsonNotifAdmin = "{"
+                    + "\"fecha\":\"" + fechaNotif + "\","
+                    + "\"mensaje\":\"Alerta de Sistema: Nueva cita registrada (ID Cita: " + idCitaRecienCreada + ")\","
+                    + "\"cita\":{\"id\":" + idCitaRecienCreada + "},"
+                    + "\"usuario\":{\"id\":" + idAdministrador + "}"
+                    + "}";
+            ApiCliente.post("http://localhost:8081/notificaciones", jsonNotifAdmin);
+            // ========================================================
+
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Cita agendada correctamente"
+            );
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Error al agendar cita"
+            );
+        }
+    }//GEN-LAST:event_btnAgendarCitaActionPerformed
+
+    // 🌟 MÉTODO AUXILIAR PARA TRADUCIR ID_DOCTOR A ID_USUARIO
+    private int obtenerUsuarioIdDelDoctor(int doctorId) {
+        if (doctorId == 8) return 18; // Samira
+        if (doctorId == 5) return 14; // Maria
+        if (doctorId == 6) return 15; // David
+        if (doctorId == 7) return 16; // Anna
+        if (doctorId == 2) return 11; // Danna
+        
+        return 1; // Retorno de seguridad (admin)
+    }
+    
+    private void cbEspecialidadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbEspecialidadActionPerformed
+CargarDatos.cargarDoctoresPorEspecialidad(
+                cbEspecialidad,
+                cbDoctor
+        );
+
+        CargarDatos.cargarHorasDisponibles(
+                cbDoctor,
+                cbFecha,
+                cbHora
+        );
+    }//GEN-LAST:event_cbEspecialidadActionPerformed
+
+    private void btnVolverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVolverActionPerformed
+MenuPaciente menu = new MenuPaciente(usuarioIdGlobal, correoPacienteGlobal);
+        menu.setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_btnVolverActionPerformed
 
     /**
      * @param args the command line arguments
@@ -230,23 +522,22 @@ public class AgendarCita extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel JPInicio;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JComboBox<String> jComboBox1;
-    private javax.swing.JComboBox<String> jComboBox2;
-    private javax.swing.JComboBox<String> jComboBox3;
-    private javax.swing.JComboBox<String> jComboBox4;
+    private javax.swing.JButton btnAgendarCita;
+    private javax.swing.JButton btnVolver;
+    private javax.swing.JComboBox<String> cbDoctor;
+    private javax.swing.JComboBox<String> cbEspecialidad;
+    private javax.swing.JComboBox<String> cbFecha;
+    private javax.swing.JComboBox<String> cbHora;
+    private javax.swing.JComboBox<String> cbSintoma;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextArea jTextArea1;
+    private javax.swing.JLabel lblPaciente;
     // End of variables declaration//GEN-END:variables
 }

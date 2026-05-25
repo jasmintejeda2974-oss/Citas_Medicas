@@ -1,3 +1,9 @@
+
+import javax.swing.JOptionPane;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import utils.ApiCliente;
+
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
@@ -8,14 +14,86 @@
  * @author Jazmín
  */
 public class MenuDoctor extends javax.swing.JFrame {
-
+private int usuarioId;
+    private String correo;
+        private String correoDoctorGlobal;
+private int usuarioIdGlobal;
     /**
      * Creates new form MenuDoctor
      */
     public MenuDoctor() {
         initComponents();
     }
+    
 
+public MenuDoctor(int usuarioId) {
+    initComponents();
+    this.usuarioId = usuarioId;
+}
+
+public MenuDoctor(int usuarioId, String correo) {
+        initComponents();
+        this.usuarioId = usuarioId;
+        this.correo = correo;
+        
+        jLabel3.setText("BIENVENIDO DOCTOR"); 
+        
+        // 📅 Llamamos al método para cargar la siguiente cita de manera segura
+        obtenerProximaCita();
+    }
+
+private void obtenerProximaCita() {
+    try {
+        // 1. Solicitamos todas las citas asignadas al correo de este doctor
+        String respuesta = ApiCliente.get("http://localhost:8081/citas/doctor/" + this.correo);
+        org.json.JSONArray array = new org.json.JSONArray(respuesta);
+
+        // 获取当前系统时间 (Obtenemos la fecha y hora actual del sistema)
+        java.time.LocalDateTime ahora = java.time.LocalDateTime.now();
+        org.json.JSONObject citaMasCercana = null;
+        java.time.LocalDateTime fechaCitaMasCercana = null;
+
+        // 2. Recorremos todas las citas del doctor buscando la próxima válida
+        for (int i = 0; i < array.length(); i++) {
+            org.json.JSONObject cita = array.getJSONObject(i);
+            String fechaStr = cita.getString("fecha"); // Ejemplo: "2026-05-24T10:00:00" o con espacios
+            
+            // Reemplazamos espacio por 'T' temporalmente para asegurar un parseo correcto en Java
+            fechaStr = fechaStr.replace(" ", "T");
+            
+            // Convertimos el texto de la base de datos a un objeto LocalDateTime comparable
+            java.time.LocalDateTime fechaCita = java.time.LocalDateTime.parse(fechaStr);
+
+            // 🔍 FILTRO 1: ¿La cita es en el futuro o es justamente hoy/ahora mismo?
+            if (fechaCita.isAfter(ahora) || fechaCita.isEqual(ahora)) {
+                
+                // 🔍 FILTRO 2: Si es la primera que encontramos en el futuro, o es más cercana que la anterior guardada
+                if (fechaCitaMasCercana == null || fechaCita.isBefore(fechaCitaMasCercana)) {
+                    citaMasCercana = cita;
+                    fechaCitaMasCercana = fechaCita;
+                }
+            }
+        }
+
+        // 3. Evaluamos el resultado final para actualizar la interfaz
+        if (citaMasCercana != null) {
+            // Si encontramos una cita futura o de hoy, extraemos sus datos
+            String fechaHoraFinal = citaMasCercana.getString("fecha").replace("T", " ");
+            String paciente = citaMasCercana.getJSONObject("usuario").getString("nombre");
+            
+            // Mostramos la información de forma vistosa usando saltos de línea HTML
+            lbNotificaciones.setText("<html><b>Próxima cita:</b><br>📅 " + fechaHoraFinal + "<br>👤 Paciente: " + paciente + "</html>");
+        } else {
+            // Si recorrió todo el ciclo y ninguna cita está en el futuro, o no hay registros
+            lbNotificaciones.setText("<html><b>Aún no hay citas próximas</b></html>");
+        }
+
+    } catch (Exception e) {
+        e.printStackTrace();
+        // Evitamos que se rompa la interfaz visual si el servidor llegara a fallar temporalmente
+        lbNotificaciones.setText("<html><font color='red'>Error al conectar con las citas</font></html>");
+    }
+}
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -31,11 +109,11 @@ public class MenuDoctor extends javax.swing.JFrame {
         btnVerCitas = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
         btnHistorialClinico = new javax.swing.JButton();
-        btnPacientes = new javax.swing.JButton();
         btnCerrarSesion = new javax.swing.JButton();
+        btnNotifi = new javax.swing.JButton();
         jPanel2 = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
+        lbNotificaciones = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -51,7 +129,7 @@ public class MenuDoctor extends javax.swing.JFrame {
         JPInicioLayout.setHorizontalGroup(
             JPInicioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, JPInicioLayout.createSequentialGroup()
-                .addContainerGap(160, Short.MAX_VALUE)
+                .addContainerGap(199, Short.MAX_VALUE)
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 201, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(93, 93, 93))
         );
@@ -64,15 +142,35 @@ public class MenuDoctor extends javax.swing.JFrame {
         );
 
         btnVerCitas.setText("VER CITAS");
+        btnVerCitas.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnVerCitasActionPerformed(evt);
+            }
+        });
 
         jLabel2.setFont(new java.awt.Font("Segoe UI", 2, 18)); // NOI18N
         jLabel2.setText("SISTEMA DE CITAS MEDICAS ");
 
         btnHistorialClinico.setText("HISTORIAL CLÍNICO");
-
-        btnPacientes.setText("PACIENTES");
+        btnHistorialClinico.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnHistorialClinicoActionPerformed(evt);
+            }
+        });
 
         btnCerrarSesion.setText("CERRAR SESIÓN");
+        btnCerrarSesion.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCerrarSesionActionPerformed(evt);
+            }
+        });
+
+        btnNotifi.setText("NOTIFICACIONES");
+        btnNotifi.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnNotifiActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -85,8 +183,8 @@ public class MenuDoctor extends javax.swing.JFrame {
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(btnHistorialClinico, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(btnVerCitas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(btnPacientes, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(btnCerrarSesion, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                            .addComponent(btnCerrarSesion, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnNotifi, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(25, 25, 25)
                         .addComponent(jLabel2)))
@@ -97,21 +195,21 @@ public class MenuDoctor extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(43, 43, 43)
                 .addComponent(jLabel2)
-                .addGap(61, 61, 61)
-                .addComponent(btnVerCitas, javax.swing.GroupLayout.DEFAULT_SIZE, 51, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 37, Short.MAX_VALUE)
+                .addComponent(btnVerCitas, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(btnHistorialClinico, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnPacientes, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(18, 18, 18)
                 .addComponent(btnCerrarSesion, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(30, 30, 30)
+                .addComponent(btnNotifi)
                 .addContainerGap())
         );
 
         jLabel3.setFont(new java.awt.Font("Segoe UI", 2, 14)); // NOI18N
         jLabel3.setText("BIENVENIDO DOCTOR");
 
-        jLabel4.setText("- Notificaciones");
+        lbNotificaciones.setText("- Notificaciones");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -119,20 +217,17 @@ public class MenuDoctor extends javax.swing.JFrame {
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addGap(37, 37, 37)
-                .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(lbNotificaciones, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(75, Short.MAX_VALUE))
+            .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabel3)
-                .addGap(95, 95, 95)
-                .addComponent(jLabel4)
+                .addGap(47, 47, 47)
+                .addComponent(lbNotificaciones)
                 .addGap(129, 129, 129))
         );
 
@@ -160,6 +255,36 @@ public class MenuDoctor extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btnVerCitasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVerCitasActionPerformed
+CitasDoctor citas = new CitasDoctor(this.usuarioId, this.correo);
+        citas.setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_btnVerCitasActionPerformed
+
+    private void btnCerrarSesionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCerrarSesionActionPerformed
+    MenuPrincipal login = new MenuPrincipal();
+        login.setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_btnCerrarSesionActionPerformed
+
+    private void btnNotifiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNotifiActionPerformed
+// 🌟 CORREGIDO: Usamos las variables que sí contienen los datos reales del Doctor
+        Notificaciones varNotif = new Notificaciones(this.usuarioId, this.correo, "DOCTOR");
+        
+        varNotif.setVisible(true);
+        varNotif.setLocationRelativeTo(null);
+        
+        // Cerramos el menú actual para mantener limpia la pantalla
+        this.dispose();
+    }//GEN-LAST:event_btnNotifiActionPerformed
+
+    private void btnHistorialClinicoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHistorialClinicoActionPerformed
+// Llama al constructor número 2 pasándole el ID y Correo del Doctor
+    HistorialPaciente ventanaHistorial = new HistorialPaciente(this.usuarioId, this.correo);
+    ventanaHistorial.setVisible(true);
+    this.dispose();
+    }//GEN-LAST:event_btnHistorialClinicoActionPerformed
 
     /**
      * @param args the command line arguments
@@ -200,13 +325,13 @@ public class MenuDoctor extends javax.swing.JFrame {
     private javax.swing.JPanel JPInicio;
     private javax.swing.JButton btnCerrarSesion;
     private javax.swing.JButton btnHistorialClinico;
-    private javax.swing.JButton btnPacientes;
+    private javax.swing.JButton btnNotifi;
     private javax.swing.JButton btnVerCitas;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JLabel lbNotificaciones;
     // End of variables declaration//GEN-END:variables
 }
