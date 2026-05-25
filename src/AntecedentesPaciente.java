@@ -36,7 +36,7 @@ private void cargarAntecedentes() {
     }
 
     try {
-        String url = "http://https://shrubs-calzone-decency.ngrok-free.dev/historial/usuario/" + this.usuarioIdGlobal;
+        String url = "https://shrubs-calzone-decency.ngrok-free.dev/historial/usuario/" + this.usuarioIdGlobal;
         String respuesta = ApiCliente.get(url);
 
         // Si el servidor responde con datos válidos
