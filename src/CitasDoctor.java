@@ -30,7 +30,7 @@ initComponents();
         this.usuarioIdDoctor = usuarioId;
         this.correoDoctor = correo;
         
-        // 🏷️ Mostramos el correo del médico logueado en la interfaz
+        // Mostramos el correo del médico logueado en la interfaz
         if (lbNombre != null) {
             lbNombre.setText(this.correoDoctor);
         }
@@ -39,7 +39,7 @@ initComponents();
     }
 
   private void cargarCitas() {
-        // 🔑 SEGURO DE VIDA: Si no hay correo, no gastamos recursos llamando a la API
+        //SEGURO DE VIDA: Si no hay correo, no gastamos recursos llamando a la API
         if (correoDoctor == null || correoDoctor.trim().isEmpty()) {
             System.out.println("⚠️ Alerta: Se intentó cargar citas pero 'correoDoctor' está vacío.");
             return; 
@@ -64,7 +64,7 @@ initComponents();
             modelo.addColumn("Síntoma");
             modelo.addColumn("Estado");
 
-            // 🕒 Obtenemos la fecha y hora exacta del sistema en este instante
+            //Obtenemos la fecha y hora exacta del sistema en este instante
             java.time.LocalDateTime ahora = java.time.LocalDateTime.now();
 
             for (int i = 0; i < array.length(); i++) {
@@ -75,7 +75,7 @@ initComponents();
                 String sintoma = obj.getJSONObject("sintoma").getString("nombre");
                 String estado = obj.getString("estado");
 
-                // 🛠️ Procesamos la fecha para poder compararla correctamente en Java
+                // Procesamos la fecha para poder compararla correctamente en Java
                 try {
                     String fechaParseable = fechaOriginal.replace(" ", "T");
                     java.time.LocalDateTime fechaCita = java.time.LocalDateTime.parse(fechaParseable);
