@@ -48,7 +48,7 @@ private void obtenerProximaCita() {
         String respuesta = ApiCliente.get("https://shrubs-calzone-decency.ngrok-free.dev/citas/doctor/" + this.correo);
         org.json.JSONArray array = new org.json.JSONArray(respuesta);
 
-        // 获取当前系统时间 (Obtenemos la fecha y hora actual del sistema)
+        //  (Obtenemos la fecha y hora actual del sistema)
         java.time.LocalDateTime ahora = java.time.LocalDateTime.now();
         org.json.JSONObject citaMasCercana = null;
         java.time.LocalDateTime fechaCitaMasCercana = null;
