@@ -26,7 +26,7 @@ public class AdministrarCitas extends javax.swing.JFrame {
 private void cargarCitas() {
         try {
             // Traemos todas las citas generales del sistema
-            String respuesta = ApiCliente.get("http://192.168.0.118:8081/citas");
+            String respuesta = ApiCliente.get("http://192.168.107.103:8081/citas");
 
             if (respuesta == null || respuesta.trim().isEmpty() || respuesta.startsWith("Error")) {
                 limpiarTabla();
@@ -237,7 +237,7 @@ try {
             int id = Integer.parseInt(txtCitas.getValueAt(fila, 0).toString());
             
             // 🚀 URL CORREGIDA: /citas/estado/{id}/FINALIZADA
-            ApiCliente.put("http://192.168.0.118:8081/citas/estado/" + id + "/FINALIZADA");
+            ApiCliente.put("http://192.168.107.103:8081/citas/estado/" + id + "/FINALIZADA");
             
             JOptionPane.showMessageDialog(this, "Cita marcada como Finalizada.");
             cargarCitas();
@@ -257,7 +257,7 @@ try {
             int id = Integer.parseInt(txtCitas.getValueAt(fila, 0).toString());
             
             // 🚀 URL CORREGIDA: /citas/estado/{id}/CANCELADA
-            ApiCliente.put("http://192.168.0.118:8081/citas/estado/" + id + "/CANCELADA");
+            ApiCliente.put("http://192.168.107.103:8081/citas/estado/" + id + "/CANCELADA");
             
             JOptionPane.showMessageDialog(this, "Cita Cancelada con éxito.");
             cargarCitas();
@@ -277,7 +277,7 @@ try {
             int id = Integer.parseInt(txtCitas.getValueAt(fila, 0).toString());
             
             // 🚀 URL CORREGIDA: /citas/estado/{id}/CONFIRMADA
-            ApiCliente.put("http://192.168.0.118:8081/citas/estado/" + id + "/CONFIRMADA");
+            ApiCliente.put("http://192.168.107.103:8081/citas/estado/" + id + "/CONFIRMADA");
             
             JOptionPane.showMessageDialog(this, "¡Cita Confirmada con éxito!");
             cargarCitas(); // Recargamos la tabla para ver el cambio

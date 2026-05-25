@@ -46,7 +46,7 @@ public class HistorialPaciente extends javax.swing.JFrame {
 
     try {
         // 🏥 Cambiamos el endpoint para apuntar al controlador del historial/antecedentes
-        String url = "http://192.168.0.118:8081/historial/usuario/correo/" + correoTarget.trim();
+        String url = "http://192.168.107.103:8081/historial/usuario/correo/" + correoTarget.trim();
         String respuesta = ApiCliente.get(url);
 
         DefaultTableModel model = (DefaultTableModel) THistorial.getModel();
@@ -266,7 +266,7 @@ String entrada = txtCorreoBuscar.getText().trim();
         int idBuscar = Integer.parseInt(entrada);
         
         // 🚀 Si es número, armamos la URL limpia por ID sin romper tu método original
-        String url = "http://192.168.0.118:8081/historial/usuario/" + idBuscar;
+        String url = "http://192.168.107.103:8081/historial/usuario/" + idBuscar;
         System.out.println("Buscando por ID en: " + url);
         
         String respuesta = utils.ApiCliente.get(url);

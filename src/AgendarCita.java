@@ -349,7 +349,7 @@ public class AgendarCita extends javax.swing.JFrame {
             // =========================
             String respuestaUsuario
                     = ApiCliente.get(
-                            "http://192.168.0.118:8081/usuarios/correo/"
+                            "http://192.168.107.103:8081/usuarios/correo/"
                             + correoPacienteGlobal
                     );
 
@@ -396,7 +396,7 @@ public class AgendarCita extends javax.swing.JFrame {
             // =========================
             String respuesta
                     = ApiCliente.post(
-                            "http://192.168.0.118:8081/citas",
+                            "http://192.168.107.103:8081/citas",
                             json
                     );
 
@@ -416,7 +416,7 @@ public class AgendarCita extends javax.swing.JFrame {
                     + "\"cita\":{\"id\":" + idCitaRecienCreada + "},"
                     + "\"usuario\":{\"id\":" + idUsuario + "}"
                     + "}";
-            ApiCliente.post("http://192.168.0.118:8081/notificaciones", jsonNotifPaciente);
+            ApiCliente.post("http://192.168.107.103:8081/notificaciones", jsonNotifPaciente);
 
             // --- NOTIFICACIÓN 2: Al Doctor asignado (CORREGIDO CON EL ID DE USUARIO REAL) ---
             // Traducimos el idDoctor (ej: 8) al usuario_id real del Login (ej: 18)
@@ -428,7 +428,7 @@ public class AgendarCita extends javax.swing.JFrame {
                     + "\"cita\":{\"id\":" + idCitaRecienCreada + "},"
                     + "\"usuario\":{\"id\":" + idUsuarioRealDelDoctor + "}" // 🥼 ¡Ahora sí apunta a su cuenta!
                     + "}";
-            ApiCliente.post("http://192.168.0.118:8081/notificaciones", jsonNotifDoctor);
+            ApiCliente.post("http://192.168.107.103:8081/notificaciones", jsonNotifDoctor);
 
             // --- NOTIFICACIÓN 3: Al Administrador ---
             int idAdministrador = 1;
@@ -438,7 +438,7 @@ public class AgendarCita extends javax.swing.JFrame {
                     + "\"cita\":{\"id\":" + idCitaRecienCreada + "},"
                     + "\"usuario\":{\"id\":" + idAdministrador + "}"
                     + "}";
-            ApiCliente.post("http://192.168.0.118:8081/notificaciones", jsonNotifAdmin);
+            ApiCliente.post("http://192.168.107.103:8081/notificaciones", jsonNotifAdmin);
             // ========================================================
 
             JOptionPane.showMessageDialog(
