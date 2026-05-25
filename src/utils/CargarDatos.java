@@ -13,7 +13,7 @@ public class CargarDatos {
     // =========================
     public static void cargarSintomas(JComboBox<String> cbSintoma) {
         try {
-            String respuesta = ApiCliente.get("http://192.168.107.103:8081/sintomas");
+            String respuesta = ApiCliente.get("https://shrubs-calzone-decency.ngrok-free.dev/sintomas");
             JSONArray array = new JSONArray(respuesta);
             cbSintoma.removeAllItems();
             for (int i = 0; i < array.length(); i++) {
@@ -33,7 +33,7 @@ public class CargarDatos {
     public static void cargarEspecialidades(javax.swing.JComboBox<String> cbEspecialidad) {
         try {
             String respuesta = ApiCliente.get(
-                    "http://192.168.107.103:8081/especialidades"
+                    "https://shrubs-calzone-decency.ngrok-free.dev/especialidades"
             );
             org.json.JSONArray array = new org.json.JSONArray(respuesta);
             cbEspecialidad.removeAllItems();
@@ -56,7 +56,7 @@ public class CargarDatos {
     // =========================
     public static void cargarDoctores(JComboBox<String> cbDoctor) {
         try {
-            String respuesta = ApiCliente.get("http://192.168.107.103:8081/doctores");
+            String respuesta = ApiCliente.get("https://shrubs-calzone-decency.ngrok-free.dev/doctores");
             JSONArray array = new JSONArray(respuesta);
             cbDoctor.removeAllItems();
             for (int i = 0; i < array.length(); i++) {
@@ -99,7 +99,7 @@ public class CargarDatos {
                     = especialidad.replace(" ", "%20");
 
             String url
-                    = "http://192.168.107.103:8081/doctores/especialidad/"
+                    = "https://shrubs-calzone-decency.ngrok-free.dev/doctores/especialidad/"
                     + especialidadCodificada;
 
             System.out.println("URL: " + url);
@@ -162,7 +162,7 @@ public class CargarDatos {
             String fecha = cbFecha.getSelectedItem().toString();
 
             // 🌐 Petición al endpoint que ya tienes mapeado en tu CitaController
-            String respuesta = ApiCliente.get("http://192.168.107.103:8081/citas/ocupadas/" + doctorId + "/" + fecha);
+            String respuesta = ApiCliente.get("https://shrubs-calzone-decency.ngrok-free.dev/citas/ocupadas/" + doctorId + "/" + fecha);
             JSONArray horasOcupadas = new JSONArray(respuesta);
             
             String[] todasHoras = {

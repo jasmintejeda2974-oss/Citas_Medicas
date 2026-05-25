@@ -317,18 +317,10 @@ public class AgendarCita extends javax.swing.JFrame {
 
     private void btnAgendarCitaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgendarCitaActionPerformed
      try {
-
-            if (cbDoctor.getSelectedItem() == null
-                    || cbSintoma.getSelectedItem() == null) {
-
-                JOptionPane.showMessageDialog(
-                        this,
-                        "Selecciona doctor y síntoma"
-                );
-
+            if (cbDoctor.getSelectedItem() == null || cbSintoma.getSelectedItem() == null) {
+                JOptionPane.showMessageDialog(this,"Selecciona doctor y síntoma");
                 return;
             }
-
             // =========================
             // HORA
             // =========================
@@ -347,11 +339,7 @@ public class AgendarCita extends javax.swing.JFrame {
             // =========================
             // OBTENER PACIENTE REAL
             // =========================
-            String respuestaUsuario
-                    = ApiCliente.get(
-                            "http://192.168.107.103:8081/usuarios/correo/"
-                            + correoPacienteGlobal
-                    );
+            String respuestaUsuario = ApiCliente.get("https://shrubs-calzone-decency.ngrok-free.dev/usuarios/correo/"+ correoPacienteGlobal);
 
             JSONObject usuarioJson
                     = new JSONObject(respuestaUsuario);
@@ -396,7 +384,7 @@ public class AgendarCita extends javax.swing.JFrame {
             // =========================
             String respuesta
                     = ApiCliente.post(
-                            "http://192.168.107.103:8081/citas",
+                            "https://shrubs-calzone-decency.ngrok-free.dev/citas",
                             json
                     );
 
@@ -416,7 +404,7 @@ public class AgendarCita extends javax.swing.JFrame {
                     + "\"cita\":{\"id\":" + idCitaRecienCreada + "},"
                     + "\"usuario\":{\"id\":" + idUsuario + "}"
                     + "}";
-            ApiCliente.post("http://192.168.107.103:8081/notificaciones", jsonNotifPaciente);
+            ApiCliente.post("https://shrubs-calzone-decency.ngrok-free.dev/notificaciones", jsonNotifPaciente);
 
             // --- NOTIFICACIÓN 2: Al Doctor asignado (CORREGIDO CON EL ID DE USUARIO REAL) ---
             // Traducimos el idDoctor (ej: 8) al usuario_id real del Login (ej: 18)
@@ -428,7 +416,7 @@ public class AgendarCita extends javax.swing.JFrame {
                     + "\"cita\":{\"id\":" + idCitaRecienCreada + "},"
                     + "\"usuario\":{\"id\":" + idUsuarioRealDelDoctor + "}" // 🥼 ¡Ahora sí apunta a su cuenta!
                     + "}";
-            ApiCliente.post("http://192.168.107.103:8081/notificaciones", jsonNotifDoctor);
+            ApiCliente.post("https://shrubs-calzone-decency.ngrok-free.dev/notificaciones", jsonNotifDoctor);
 
             // --- NOTIFICACIÓN 3: Al Administrador ---
             int idAdministrador = 1;
@@ -438,7 +426,7 @@ public class AgendarCita extends javax.swing.JFrame {
                     + "\"cita\":{\"id\":" + idCitaRecienCreada + "},"
                     + "\"usuario\":{\"id\":" + idAdministrador + "}"
                     + "}";
-            ApiCliente.post("http://192.168.107.103:8081/notificaciones", jsonNotifAdmin);
+            ApiCliente.post("https://shrubs-calzone-decency.ngrok-free.dev/notificaciones", jsonNotifAdmin);
             // ========================================================
 
             JOptionPane.showMessageDialog(
@@ -455,7 +443,7 @@ public class AgendarCita extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnAgendarCitaActionPerformed
 
-    // 🌟 MÉTODO AUXILIAR PARA TRADUCIR ID_DOCTOR A ID_USUARIO
+    // MÉTODO AUXILIAR PARA TRADUCIR ID_DOCTOR A ID_USUARIO
     private int obtenerUsuarioIdDelDoctor(int doctorId) {
         if (doctorId == 8) return 18; // Samira
         if (doctorId == 5) return 14; // Maria

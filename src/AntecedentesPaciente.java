@@ -36,7 +36,7 @@ private void cargarAntecedentes() {
     }
 
     try {
-        String url = "http://192.168.107.103:8081/historial/usuario/" + this.usuarioIdGlobal;
+        String url = "http://https://shrubs-calzone-decency.ngrok-free.dev/historial/usuario/" + this.usuarioIdGlobal;
         String respuesta = ApiCliente.get(url);
 
         // Si el servidor responde con datos válidos
@@ -330,7 +330,7 @@ private void cargarAntecedentes() {
             json.put("medicamentos", txtMedicamento.getText().trim());
 
             // Enviamos el JSON al controlador inteligente en IntelliJ
-            String url = "http://192.168.107.103:8081/historial/guardar/" + this.usuarioIdGlobal;
+            String url = "https://shrubs-calzone-decency.ngrok-free.dev/historial/guardar/" + this.usuarioIdGlobal;
             String respuesta = ApiCliente.post(url, json.toString());
 
             if (respuesta != null && !respuesta.contains("Error")) {

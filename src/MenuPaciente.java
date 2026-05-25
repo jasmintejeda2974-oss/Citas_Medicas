@@ -43,7 +43,7 @@ public class MenuPaciente extends javax.swing.JFrame {
         try {
 
             String respuesta = ApiCliente.get(
-                    "http://192.168.107.103:8081/citas/proxima/" + correoPacienteGlobal
+                    "https://shrubs-calzone-decency.ngrok-free.dev/citas/proxima/" + correoPacienteGlobal
             );
 
             System.out.println("RESPUESTA: " + respuesta);

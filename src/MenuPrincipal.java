@@ -252,7 +252,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
 
 // CORREGIDO: Se eliminó el espacio después de las diagonales
     String respuesta = ApiCliente.post(
-            "http://192.168.107.103:8081/usuarios/login",
+            "https://shrubs-calzone-decency.ngrok-free.dev/usuarios/login",
             json
     );
 

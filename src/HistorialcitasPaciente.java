@@ -34,7 +34,7 @@ private String correoUsuarioLogueado;
     private void cargarTablaCitas() {
         try {
             // 🌐 Consultamos el endpoint de citas por usuario
-            String url = "http://192.168.107.103:8081/citas/usuario/" + correoUsuarioLogueado;
+            String url = "https://shrubs-calzone-decency.ngrok-free.dev/citas/usuario/" + correoUsuarioLogueado;
             String respuesta = ApiCliente.get(url);
 
             DefaultTableModel modelo = (DefaultTableModel) tblHistorialCitas.getModel();

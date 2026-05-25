@@ -33,7 +33,7 @@ private int usuarioIdGlobal;
 
     private void cargarDoctores() {
     try {
-        String respuesta = ApiCliente.get("http://192.168.107.103:8081/doctores");
+        String respuesta = ApiCliente.get("https://shrubs-calzone-decency.ngrok-free.dev/doctores");
         JSONArray array = new JSONArray(respuesta);
         DefaultTableModel modelo = new DefaultTableModel();
 

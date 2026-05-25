@@ -46,7 +46,7 @@ initComponents();
         }
 
         try {
-            String url = "http://192.168.107.103:8081/citas/doctor/" + correoDoctor;
+            String url = "https://shrubs-calzone-decency.ngrok-free.dev/citas/doctor/" + correoDoctor;
             String respuesta = ApiCliente.get(url);
 
             // Si la API responde vacío, evitamos que trone el constructor de JSONArray
