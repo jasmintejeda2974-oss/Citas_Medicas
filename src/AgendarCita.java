@@ -316,58 +316,40 @@ public class AgendarCita extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnAgendarCitaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgendarCitaActionPerformed
-     try {
+try {
             if (cbDoctor.getSelectedItem() == null || cbSintoma.getSelectedItem() == null) {
-                JOptionPane.showMessageDialog(this,"Selecciona doctor y síntoma");
+                JOptionPane.showMessageDialog(this, "Selecciona doctor y síntoma");
                 return;
             }
             // =========================
             // HORA
             // =========================
-            String hora
-                    = cbHora.getSelectedItem().toString();
+            String hora = cbHora.getSelectedItem().toString();
 
             if (hora.length() == 7) {
                 hora = "0" + hora;
             }
 
-            String fecha
-                    = cbFecha.getSelectedItem().toString()
-                    + "T"
-                    + hora;
+            String fecha = cbFecha.getSelectedItem().toString() + "T" + hora;
 
             // =========================
             // OBTENER PACIENTE REAL
             // =========================
-            String respuestaUsuario = ApiCliente.get("https://shrubs-calzone-decency.ngrok-free.dev/usuarios/correo/"+ correoPacienteGlobal);
-
-            JSONObject usuarioJson
-                    = new JSONObject(respuestaUsuario);
-
-            int idUsuario
-                    = usuarioJson.getInt("id");
+            String respuestaUsuario = ApiCliente.get("https://shrubs-calzone-decency.ngrok-free.dev/usuarios/correo/" + correoPacienteGlobal);
+            JSONObject usuarioJson = new JSONObject(respuestaUsuario);
+            int idUsuario = usuarioJson.getInt("id");
 
             // =========================
-            // OBTENER DOCTOR
+            // OBTENER DOCTOR SELECCIONADO
             // =========================
-            String docSel
-                    = cbDoctor.getSelectedItem().toString();
-
-            int idDoctor
-                    = Integer.parseInt(
-                            docSel.split(" - ")[0]
-                    );
+            String docSel = cbDoctor.getSelectedItem().toString();
+            int idDoctor = Integer.parseInt(docSel.split(" - ")[0]);
 
             // =========================
             // OBTENER SINTOMA
             // =========================
-            String seleccionado
-                    = cbSintoma.getSelectedItem().toString();
-
-            int idSintoma
-                    = Integer.parseInt(
-                            seleccionado.split(" - ")[0]
-                    );
+            String seleccionado = cbSintoma.getSelectedItem().toString();
+            int idSintoma = Integer.parseInt(seleccionado.split(" - ")[0]);
 
             // =========================
             // JSON CITA
@@ -382,16 +364,11 @@ public class AgendarCita extends javax.swing.JFrame {
             // =========================
             // GUARDAR CITA
             // =========================
-            String respuesta
-                    = ApiCliente.post(
-                            "https://shrubs-calzone-decency.ngrok-free.dev/citas",
-                            json
-                    );
-
+            String respuesta = ApiCliente.post("https://shrubs-calzone-decency.ngrok-free.dev/citas", json);
             System.out.println(respuesta);
 
             // ========================================================
-            // 🌟 NOTIFICACIONES AUTOMÁTICAS REPARADAS
+            // NOTIFICACIONES AUTOMÁTICAS REPARADAS Y DINÁMICAS
             // ========================================================
             JSONObject citaCreadaJson = new JSONObject(respuesta);
             int idCitaRecienCreada = citaCreadaJson.getInt("id");
@@ -406,15 +383,19 @@ public class AgendarCita extends javax.swing.JFrame {
                     + "}";
             ApiCliente.post("https://shrubs-calzone-decency.ngrok-free.dev/notificaciones", jsonNotifPaciente);
 
-            // --- NOTIFICACIÓN 2: Al Doctor asignado (CORREGIDO CON EL ID DE USUARIO REAL) ---
-            // Traducimos el idDoctor (ej: 8) al usuario_id real del Login (ej: 18)
-            int idUsuarioRealDelDoctor = obtenerUsuarioIdDelDoctor(idDoctor);
+            // 🟢 --- NOTIFICACIÓN 2: AL DOCTOR (AHORA 100% DINÁMICO DESDE LA API) ---
+            // Le pedimos a la API los datos del doctor usando su id de doctor directamente
+            String respuestaDoctor = ApiCliente.get("https://shrubs-calzone-decency.ngrok-free.dev/doctores/" + idDoctor);
+            JSONObject doctorJson = new JSONObject(respuestaDoctor);
+            
+            // Extraemos de forma automática el id del usuario que viene anidado en el doctor
+            int idUsuarioRealDelDoctor = doctorJson.getJSONObject("usuario").getInt("id");
 
             String jsonNotifDoctor = "{"
                     + "\"fecha\":\"" + fechaNotif + "\","
                     + "\"mensaje\":\"Tienes una nueva cita asignada con el paciente: " + correoPacienteGlobal + "\","
                     + "\"cita\":{\"id\":" + idCitaRecienCreada + "},"
-                    + "\"usuario\":{\"id\":" + idUsuarioRealDelDoctor + "}" // 🥼 ¡Ahora sí apunta a su cuenta!
+                    + "\"usuario\":{\"id\":" + idUsuarioRealDelDoctor + "}" // 🥼 ¡Dinámico para doctores nuevos!
                     + "}";
             ApiCliente.post("https://shrubs-calzone-decency.ngrok-free.dev/notificaciones", jsonNotifDoctor);
 
@@ -429,30 +410,14 @@ public class AgendarCita extends javax.swing.JFrame {
             ApiCliente.post("https://shrubs-calzone-decency.ngrok-free.dev/notificaciones", jsonNotifAdmin);
             // ========================================================
 
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Cita agendada correctamente"
-            );
+            JOptionPane.showMessageDialog(this, "Cita agendada correctamente");
 
         } catch (Exception e) {
             e.printStackTrace();
-            JOptionPane.showMessageDialog(
-                    this,
-                    "Error al agendar cita"
-            );
+            JOptionPane.showMessageDialog(this, "Error al agendar cita");
         }
     }//GEN-LAST:event_btnAgendarCitaActionPerformed
 
-    // MÉTODO AUXILIAR PARA TRADUCIR ID_DOCTOR A ID_USUARIO
-    private int obtenerUsuarioIdDelDoctor(int doctorId) {
-        if (doctorId == 8) return 18; // Samira
-        if (doctorId == 5) return 14; // Maria
-        if (doctorId == 6) return 15; // David
-        if (doctorId == 7) return 16; // Anna
-        if (doctorId == 2) return 11; // Danna
-        
-        return 1; // Retorno de seguridad (admin)
-    }
     
     private void cbEspecialidadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbEspecialidadActionPerformed
 CargarDatos.cargarDoctoresPorEspecialidad(
