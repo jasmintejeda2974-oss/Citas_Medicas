@@ -254,10 +254,55 @@ try {
     }//GEN-LAST:event_btnVolverActionPerformed
 
     private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
-    String correoABuscar = txtCorreoBuscar.getText();
-        cargarHistorial(correoABuscar);
+String entrada = txtCorreoBuscar.getText().trim();
+    
+    if (entrada.isEmpty()) {
+        JOptionPane.showMessageDialog(this, "Por favor, introduce un dato para buscar.");
+        return;
+    }
+    
+    try {
+        // 🤔 ¿Es un número puro? (Como el 1 o el 6 que salían en tu error)
+        int idBuscar = Integer.parseInt(entrada);
+        
+        // 🚀 Si es número, armamos la URL limpia por ID sin romper tu método original
+        String url = "http://localhost:8081/historial/usuario/" + idBuscar;
+        System.out.println("Buscando por ID en: " + url);
+        
+        String respuesta = utils.ApiCliente.get(url);
+        procesarYClasificarHistorial(respuesta);
+        
+    } catch (NumberFormatException e) {
+        // 📧 Si contiene letras (es un correo como natalia@gmail.com), 
+        // llamamos a tu método de toda la vida. ¡Tus otras ventanas seguirán felices!
+        cargarHistorial(entrada);
+    }
     }//GEN-LAST:event_btnBuscarActionPerformed
 
+    private void procesarYClasificarHistorial(String respuesta) {
+    try {
+        DefaultTableModel model = (DefaultTableModel) THistorial.getModel();
+        model.setRowCount(0);
+
+        if (respuesta == null || respuesta.trim().isEmpty() || respuesta.startsWith("Error")) {
+            JOptionPane.showMessageDialog(this, "El paciente no tiene un historial clínico registrado aún.");
+            return;
+        }
+
+        org.json.JSONObject obj = new org.json.JSONObject(respuesta);
+        
+        model.addRow(new Object[]{
+            obj.optString("tipoSangre", "No registrado"),
+            obj.optString("alergias", "Ninguna"),
+            obj.optString("antecedentes", "Ninguno"),
+            obj.optString("enfermedadesCronicas", "Ninguna"),
+            obj.optString("medicamentos", "Ninguno")
+        });
+    } catch (Exception ex) {
+        ex.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Error al procesar los datos clínicos.");
+    }
+}
     /**
      * @param args the command line arguments
      */
