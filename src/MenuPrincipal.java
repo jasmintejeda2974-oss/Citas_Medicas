@@ -86,7 +86,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
         jLabel4.setForeground(new java.awt.Color(255, 255, 255));
         jLabel4.setText("INICIO DE SESIÓN");
 
-        jLabel6.setText("USUARIO:");
+        jLabel6.setText("CORREO:");
 
         jLabel7.setText("CONTRASEÑA:");
 
