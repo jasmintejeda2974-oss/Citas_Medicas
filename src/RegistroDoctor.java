@@ -24,7 +24,7 @@ public class RegistroDoctor extends javax.swing.JFrame {
 
     private void cargarEspecialidades() {
         try {
-            String respuesta = ApiCliente.get("http:// 192.168.0.118:8081/especialidades");
+            String respuesta = ApiCliente.get("http://192.168.0.118:8081/especialidades");
             JSONArray array = new JSONArray(respuesta);
             cbEspecialidad.removeAllItems();
 
@@ -281,7 +281,7 @@ public class RegistroDoctor extends javax.swing.JFrame {
                     + "\"rol\":\"DOCTOR\""
                     + "}";
 
-            String respuestaUsuario = ApiCliente.post("http:// 192.168.0.118:8081/usuarios/registrar", usuarioJson);
+            String respuestaUsuario = ApiCliente.post("http://192.168.0.118:8081/usuarios/registrar", usuarioJson);
             System.out.println("USUARIO: " + respuestaUsuario);
 
             // =========================
@@ -305,7 +305,7 @@ public class RegistroDoctor extends javax.swing.JFrame {
                     + "}"
                     + "}";
 
-            String respuestaDoctor = ApiCliente.post("http:// 192.168.0.118:8081/doctores", doctorJson);
+            String respuestaDoctor = ApiCliente.post("http://192.168.0.118:8081/doctores", doctorJson);
             System.out.println("RESPUESTA DOCTOR: " + respuestaDoctor);
 
             // =========================

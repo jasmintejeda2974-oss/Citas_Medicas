@@ -45,7 +45,7 @@ public MenuDoctor(int usuarioId, String correo) {
 private void obtenerProximaCita() {
     try {
         // 1. Solicitamos todas las citas asignadas al correo de este doctor
-        String respuesta = ApiCliente.get("http:// 192.168.0.118:8081/citas/doctor/" + this.correo);
+        String respuesta = ApiCliente.get("http://192.168.0.118:8081/citas/doctor/" + this.correo);
         org.json.JSONArray array = new org.json.JSONArray(respuesta);
 
         // 获取当前系统时间 (Obtenemos la fecha y hora actual del sistema)

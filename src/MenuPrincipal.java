@@ -250,8 +250,9 @@ public class MenuPrincipal extends javax.swing.JFrame {
             + "\"password\":\"" + password + "\""
             + "}";
 
+// CORREGIDO: Se eliminó el espacio después de las diagonales
     String respuesta = ApiCliente.post(
-            "http:// 192.168.0.118:8081/usuarios/login",
+            "http://192.168.0.118:8081/usuarios/login",
             json
     );
 

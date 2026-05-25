@@ -313,7 +313,7 @@ public class Registro extends javax.swing.JFrame {
                     + "}";
 
             String respuesta = ApiCliente.post(
-                    "http:// 192.168.0.118:8081/usuarios",
+                    "http://192.168.0.118:8081/usuarios",
                     json
             );
 
