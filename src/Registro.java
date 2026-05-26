@@ -18,12 +18,8 @@ public class Registro extends javax.swing.JFrame {
      */
     public Registro() {
         initComponents();
-        cmbRol.removeAllItems(); // Limpiamos para asegurar el orden
+        cmbRol.removeAllItems(); // Borramos PACIENTE, DOCTOR, ADMIN creados en el diseño
         cmbRol.addItem("PACIENTE");
-        cmbRol.addItem("DOCTOR");
-        cmbRol.addItem("ADMIN");
-//        cmbRol.removeAllItems(); // Borramos PACIENTE, DOCTOR, ADMIN creados en el diseño
-//        cmbRol.addItem("PACIENTE");
        // setIconImage(new ImageIcon(getClass().getResource("/img/ico.png")).getImage());
     }
 
@@ -276,110 +272,58 @@ public class Registro extends javax.swing.JFrame {
     }//GEN-LAST:event_btnVolverActionPerformed
 
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
-//    // 1. Validamos que ningún campo esté vacío
-//    if (txtNombre.getText().isEmpty()
-//            || txtCorreo.getText().isEmpty()
-//            || txtTelefono.getText().isEmpty()
-//            || txtDireccion.getText().isEmpty()
-//            || pfContraseña.getPassword().length == 0
-//            || pfConContraseña.getPassword().length == 0) {
-//
-//        JOptionPane.showMessageDialog(this, "Complete todos los campos");
-//
-//    } else {
-//        // 2. Extraemos las contraseñas y verificamos que coincidan
-//        String contraseña = new String(pfContraseña.getPassword());
-//        String confirmar = new String(pfConContraseña.getPassword());
-//
-//        if (!contraseña.equals(confirmar)) {
-//            JOptionPane.showMessageDialog(this, "Las contraseñas no coinciden");
-//        } else {
-//            // 3. Recolectamos los datos del formulario
-//            String nombre = txtNombre.getText();
-//            String correo = txtCorreo.getText();
-//            String telefono = txtTelefono.getText();
-//            String direccion = txtDireccion.getText();
-//            
-//            // 🔥 AQUÍ EL CAMBIO: Forzamos que el rol enviado sea estrictamente PACIENTE
-//            String rol = "PACIENTE"; 
-//
-//            // 4. Armamos el objeto JSON para enviar a la API externa
-//            String json = "{"
-//                    + "\"nombre\":\"" + nombre + "\","
-//                    + "\"correo\":\"" + correo + "\","
-//                    + "\"password\":\"" + contraseña + "\","
-//                    + "\"telefono\":\"" + telefono + "\","
-//                    + "\"direccion\":\"" + direccion + "\","
-//                    + "\"rol\":\"" + rol + "\""
-//                    + "}";
-//
-//            // 5. Consumimos el servicio POST del Backend
-//            String respuesta = ApiCliente.post(
-//                    "https://shrubs-calzone-decency.ngrok-free.dev/usuarios",
-//                    json
-//            );
-//
-//            System.out.println("REGISTRO RESPONSE: " + respuesta);
-//            JOptionPane.showMessageDialog(this, "Cuenta creada correctamente");
-//
-//            // 6. Redirigimos al usuario de vuelta al Login Principal
-//            MenuPrincipal menu = new MenuPrincipal();
-//            menu.setVisible(true);
-//            this.dispose();
-//        }
-//    }
-// 1. Validamos que ningún campo esté vacío
-        if (txtNombre.getText().isEmpty()
-                || txtCorreo.getText().isEmpty()
-                || txtTelefono.getText().isEmpty()
-                || txtDireccion.getText().isEmpty()
-                || pfContraseña.getPassword().length == 0
-                || pfConContraseña.getPassword().length == 0) {
+    // 1. Validamos que ningún campo esté vacío
+    if (txtNombre.getText().isEmpty()
+            || txtCorreo.getText().isEmpty()
+            || txtTelefono.getText().isEmpty()
+            || txtDireccion.getText().isEmpty()
+            || pfContraseña.getPassword().length == 0
+            || pfConContraseña.getPassword().length == 0) {
 
-            JOptionPane.showMessageDialog(this, "Complete todos los campos");
+        JOptionPane.showMessageDialog(this, "Complete todos los campos");
 
+    } else {
+        // 2. Extraemos las contraseñas y verificamos que coincidan
+        String contraseña = new String(pfContraseña.getPassword());
+        String confirmar = new String(pfConContraseña.getPassword());
+
+        if (!contraseña.equals(confirmar)) {
+            JOptionPane.showMessageDialog(this, "Las contraseñas no coinciden");
         } else {
-            // 2. Extraemos las contraseñas y verificamos que coincidan
-            String contraseña = new String(pfContraseña.getPassword());
-            String confirmar = new String(pfConContraseña.getPassword());
+            // 3. Recolectamos los datos del formulario
+            String nombre = txtNombre.getText();
+            String correo = txtCorreo.getText();
+            String telefono = txtTelefono.getText();
+            String direccion = txtDireccion.getText();
+            
+            // 🔥 AQUÍ EL CAMBIO: Forzamos que el rol enviado sea estrictamente PACIENTE
+            String rol = "PACIENTE"; 
 
-            if (!contraseña.equals(confirmar)) {
-                JOptionPane.showMessageDialog(this, "Las contraseñas no coinciden");
-            } else {
-                // 3. Recolectamos los datos del formulario
-                String nombre = txtNombre.getText();
-                String correo = txtCorreo.getText();
-                String telefono = txtTelefono.getText();
-                String direccion = txtDireccion.getText();
-                
-                // 💡 CORREGIDO: Ahora captura dinámicamente el ROL seleccionado en el ComboBox
-                String rol = cmbRol.getSelectedItem().toString(); 
+            // 4. Armamos el objeto JSON para enviar a la API externa
+            String json = "{"
+                    + "\"nombre\":\"" + nombre + "\","
+                    + "\"correo\":\"" + correo + "\","
+                    + "\"password\":\"" + contraseña + "\","
+                    + "\"telefono\":\"" + telefono + "\","
+                    + "\"direccion\":\"" + direccion + "\","
+                    + "\"rol\":\"" + rol + "\""
+                    + "}";
 
-                // 4. Armamos el objeto JSON para enviar a la API externa
-                String json = "{"
-                        + "\"nombre\":\"" + nombre + "\","
-                        + "\"correo\":\"" + correo + "\","
-                        + "\"password\":\"" + contraseña + "\","
-                        + "\"telefono\":\"" + telefono + "\","
-                        + "\"direccion\":\"" + direccion + "\","
-                        + "\"rol\":\"" + rol + "\""
-                        + "}";
+            // 5. Consumimos el servicio POST del Backend
+            String respuesta = ApiCliente.post(
+                    "https://shrubs-calzone-decency.ngrok-free.dev/usuarios",
+                    json
+            );
 
-                // 5. Consumimos el servicio POST del Backend
-                String respuesta = ApiCliente.post(
-                        "https://shrubs-calzone-decency.ngrok-free.dev/usuarios",
-                        json
-                );
+            System.out.println("REGISTRO RESPONSE: " + respuesta);
+            JOptionPane.showMessageDialog(this, "Cuenta creada correctamente");
 
-                System.out.println("REGISTRO RESPONSE: " + respuesta);
-                JOptionPane.showMessageDialog(this, "Cuenta de " + rol + " creada correctamente");
-
-                // 6. Redirigimos al usuario de vuelta al Login Principal
-                MenuPrincipal menu = new MenuPrincipal();
-                menu.setVisible(true);
-                this.dispose();
-            }
+            // 6. Redirigimos al usuario de vuelta al Login Principal
+            MenuPrincipal menu = new MenuPrincipal();
+            menu.setVisible(true);
+            this.dispose();
         }
+    }
     }//GEN-LAST:event_btnGuardarActionPerformed
 
     private void txtNombreActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtNombreActionPerformed
