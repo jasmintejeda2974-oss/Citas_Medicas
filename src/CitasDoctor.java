@@ -9,47 +9,63 @@ import utils.ApiCliente;
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-
 /**
  *
  * @author quile
  */
+
+// CLASE PRINCIPAL
+// Esta clase representa la ventana donde el doctor
+// puede visualizar todas sus citas médicas programadas
 public class CitasDoctor extends javax.swing.JFrame {
-private String correoDoctor = "";
+    
+    // VARIABLES GLOBALES
+    private String correoDoctor = "";
     private int usuarioIdDoctor;
-    /**
-     * Creates new form InfoDoctores
-     */
+    
+    // CONSTRUCTOR VACÍO
     public CitasDoctor() {
         initComponents();
         cargarCitas();
     }
     
-public CitasDoctor(int usuarioId, String correo) {
-initComponents();
+    // CONSTRUCTOR PRINCIPAL
+    // Constructor que recibe:
+    // - ID del doctor
+    // - Correo del doctor
+    public CitasDoctor(int usuarioId, String correo) {
+        initComponents();
         this.usuarioIdDoctor = usuarioId;
         this.correoDoctor = correo;
-        
-        // Mostramos el correo del médico logueado en la interfaz
+
+        // MOSTRAR NOMBRE/CORREO 
         if (lbNombre != null) {
             lbNombre.setText(this.correoDoctor);
         }
-        
+
         cargarCitas();
     }
 
-  private void cargarCitas() {
-        //SEGURO DE VIDA: Si no hay correo, no gastamos recursos llamando a la API
+    // MÉTODO CARGAR CITAS
+    // Este método consulta todas las citas
+    // del doctor desde el backend y las coloca
+    private void cargarCitas() {
+ 
+        // Verificamos que el correo no esté vacío
         if (correoDoctor == null || correoDoctor.trim().isEmpty()) {
             System.out.println("⚠️ Alerta: Se intentó cargar citas pero 'correoDoctor' está vacío.");
-            return; 
+            return;
         }
 
         try {
+            // CREAR URL DEL SERVIDOR
+            // URL para obtener citas del doctor
             String url = "https://shrubs-calzone-decency.ngrok-free.dev/citas/doctor/" + correoDoctor;
+            // PETICIÓN GET AL BACKEND            
+            // Consultamos las citas del doctor
             String respuesta = ApiCliente.get(url);
 
-            // Si la API responde vacío, evitamos que trone el constructor de JSONArray
+            // PETICIÓN GET AL BACKEND
             if (respuesta == null || respuesta.trim().isEmpty()) {
                 System.out.println("No se encontraron citas para este doctor.");
                 return;
@@ -64,7 +80,6 @@ initComponents();
             modelo.addColumn("Síntoma");
             modelo.addColumn("Estado");
 
-            //Obtenemos la fecha y hora exacta del sistema en este instante
             java.time.LocalDateTime ahora = java.time.LocalDateTime.now();
 
             for (int i = 0; i < array.length(); i++) {
@@ -75,12 +90,10 @@ initComponents();
                 String sintoma = obj.getJSONObject("sintoma").getString("nombre");
                 String estado = obj.getString("estado");
 
-                // Procesamos la fecha para poder compararla correctamente en Java
                 try {
                     String fechaParseable = fechaOriginal.replace(" ", "T");
                     java.time.LocalDateTime fechaCita = java.time.LocalDateTime.parse(fechaParseable);
 
-                    // 🔍 Evaluación dinámica del estado basado en el tiempo:
                     if (fechaCita.isBefore(ahora)) {
                         if (!estado.equalsIgnoreCase("CANCELADA")) {
                             estado = "FINALIZADA";
@@ -90,7 +103,6 @@ initComponents();
                     System.out.println("Error parseando fecha de la cita ID: " + id);
                 }
 
-                // Limpiamos visualmente la 'T' de la fecha si es que existe para la tabla
                 String fechaLimpia = fechaOriginal.replace("T", " ");
 
                 modelo.addRow(new Object[]{id, paciente, fechaLimpia, sintoma, estado});
@@ -103,6 +115,7 @@ initComponents();
             JOptionPane.showMessageDialog(this, "Error al cargar citas del doctor.");
         }
     }
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -228,10 +241,10 @@ initComponents();
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnVolverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVolverActionPerformed
-   MenuDoctor doctor = new MenuDoctor(usuarioIdDoctor, correoDoctor);
+        MenuDoctor doctor = new MenuDoctor(usuarioIdDoctor, correoDoctor);
         doctor.setVisible(true);
         this.dispose();
-    
+
     }//GEN-LAST:event_btnVolverActionPerformed
 
     /**
