@@ -9,20 +9,22 @@ import utils.ApiCliente;
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-
 /**
  *
  * @author quile
  */
+// CLASE HISTORIALCITASPACIENTE
 public class HistorialcitasPaciente extends javax.swing.JFrame {
-private String correoUsuarioLogueado;
-    /**
-     * Creates new form HistorialcitasPaciente
-     */
+    // VARIABLE GLOBAL
+    private String correoUsuarioLogueado;
+    // Constructor vacío
+    // Se ejecuta cuando no se envía información
     public HistorialcitasPaciente() {
         initComponents();
         setLocationRelativeTo(null);
     }
+
+    // CONSTRUCTOR CON PARÁMETRO
     // Constructor que recibe el correo del paciente que inició sesión
     public HistorialcitasPaciente(String correo) {
         initComponents();
@@ -30,24 +32,33 @@ private String correoUsuarioLogueado;
         this.correoUsuarioLogueado = correo;
         cargarTablaCitas(); // Se carga la tabla automáticamente al abrir
     }
-
+    
+     // MÉTODO PARA CARGAR LA TABLA DE CITAS
     private void cargarTablaCitas() {
         try {
-            // 🌐 Consultamos el endpoint de citas por usuario
+            // CREAR URL PARA CONSULTAR CITAS
+            // Consultamos el endpoint de citas por usuario
             String url = "https://shrubs-calzone-decency.ngrok-free.dev/citas/usuario/" + correoUsuarioLogueado;
+             // HACER PETICIÓN GET
+             // Se consulta el backend usando ApiCliente
             String respuesta = ApiCliente.get(url);
 
+            // OBTENER MODELO DE LA TABLA
             DefaultTableModel modelo = (DefaultTableModel) tblHistorialCitas.getModel();
             modelo.setRowCount(0); // Limpiar tabla
 
+            // VALIDAR RESPUESTA
             if (respuesta == null || respuesta.isEmpty() || respuesta.startsWith("Error")) {
                 JOptionPane.showMessageDialog(this, "No se encontraron citas registradas.");
                 return;
             }
 
             // Convertimos la respuesta en un arreglo de JSON
+             // La respuesta del backend se convierte
+            // en un arreglo JSON
             JSONArray array = new JSONArray(respuesta);
 
+            // RECORRER TODAS LAS CITAS
             for (int i = 0; i < array.length(); i++) {
                 JSONObject cita = array.getJSONObject(i);
 
@@ -75,6 +86,7 @@ private String correoUsuarioLogueado;
             JOptionPane.showMessageDialog(this, "Error al cargar el historial de citas.");
         }
     }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -184,11 +196,12 @@ private String correoUsuarioLogueado;
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
+//Método 
     private void btnVolverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVolverActionPerformed
-MenuPaciente menu = new MenuPaciente(0, this.correoUsuarioLogueado);
+        // Abrimos nuevamente el menú principal del paciente
+        MenuPaciente menu = new MenuPaciente(0, this.correoUsuarioLogueado);
         menu.setVisible(true);
-        this.dispose();    
+        this.dispose();
     }//GEN-LAST:event_btnVolverActionPerformed
 
     /**
