@@ -13,7 +13,7 @@ import utils.ApiCliente;
  */
 public class Notificaciones extends javax.swing.JFrame {
 
-private int usuarioIdGlobal;
+    private int usuarioIdGlobal;
     private String correoPacienteGlobal;
     private String rolGlobal = "PACIENTE";
     private String correoDoctorGlobal;
@@ -25,16 +25,16 @@ private int usuarioIdGlobal;
         initComponents();
     }
 
-public Notificaciones(int usuarioId, String correo) {
+    public Notificaciones(int usuarioId, String correo) {
         initComponents();
         this.usuarioIdGlobal = usuarioId;
         this.correoPacienteGlobal = correo;
-this.rolGlobal = "PACIENTE";
-
+        this.rolGlobal = "PACIENTE";
 
         cargarNotificaciones();
     }
-public Notificaciones(int usuarioId, String correo, String rol) {
+
+    public Notificaciones(int usuarioId, String correo, String rol) {
         initComponents();
         this.usuarioIdGlobal = usuarioId;
         this.correoPacienteGlobal = correo;
@@ -43,10 +43,10 @@ public Notificaciones(int usuarioId, String correo, String rol) {
         cargarNotificaciones();
     }
 
-   // 🌐 MÉTODO ÚNICO CORREGIDO PARA EVITAR DUPLICIDAD
+    // 🌐 MÉTODO ÚNICO CORREGIDO PARA EVITAR DUPLICIDAD
     private void cargarNotificaciones() {
         try {
-            System.out.println("Sincronizando notificaciones para Usuario ID: " + usuarioIdGlobal); 
+            System.out.println("Sincronizando notificaciones para Usuario ID: " + usuarioIdGlobal);
 
             // 1. Limpiar el JTextArea
             txNotificaciones.setText("");
@@ -216,49 +216,49 @@ public Notificaciones(int usuarioId, String correo, String rol) {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnActualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnActualizarActionPerformed
-cargarNotificaciones(); // Llama al método principal optimizado
+        cargarNotificaciones(); // Llama al método principal optimizado
         javax.swing.JOptionPane.showMessageDialog(this, "Notificaciones sincronizadas con éxito.", "Actualizado", javax.swing.JOptionPane.INFORMATION_MESSAGE);
-    
+
     }//GEN-LAST:event_btnActualizarActionPerformed
 
     private void btnVolverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVolverActionPerformed
-    // 1. Evaluamos qué rol abrió esta ventana para regresar al menú correspondiente con sus datos intactos
-    if (this.rolGlobal != null) {
-        switch (this.rolGlobal.toUpperCase()) {
-            case "ADMIN":
-                MenuAdministrador menuAdmin = new MenuAdministrador(this.usuarioIdGlobal, this.correoPacienteGlobal);
-                menuAdmin.setVisible(true);
-                menuAdmin.setLocationRelativeTo(null);
-                break;
-                
-            case "PACIENTE":
-                // 🔑 CORREGIDO: Le pasamos de vuelta sus credenciales al menú del paciente
-                MenuPaciente menuPaciente = new MenuPaciente(this.usuarioIdGlobal, this.correoPacienteGlobal); 
-                menuPaciente.setVisible(true);
-                menuPaciente.setLocationRelativeTo(null);
-                break;
-                
-            case "DOCTOR":
-                // 🔑 CORREGIDO: Le devolvemos el ID y el correo al MenuDoctor para que no se vacíe
-                MenuDoctor menuDoc = new MenuDoctor(this.usuarioIdGlobal, this.correoPacienteGlobal);
-                menuDoc.setVisible(true);
-                menuDoc.setLocationRelativeTo(null);
-                break;
-                
-            default:
-                MenuPrincipal login = new MenuPrincipal();
-                login.setVisible(true);
-                login.setLocationRelativeTo(null);
-                break;
-        }
-    } else {
-        MenuPrincipal login = new MenuPrincipal();
-        login.setVisible(true);
-        login.setLocationRelativeTo(null);
-    }
+        // 1. Evaluamos qué rol abrió esta ventana para regresar al menú correspondiente con sus datos intactos
+        if (this.rolGlobal != null) {
+            switch (this.rolGlobal.toUpperCase()) {
+                case "ADMIN":
+                    MenuAdministrador menuAdmin = new MenuAdministrador(this.usuarioIdGlobal, this.correoPacienteGlobal);
+                    menuAdmin.setVisible(true);
+                    menuAdmin.setLocationRelativeTo(null);
+                    break;
 
-    // 2. Cierra la ventana de notificaciones sin tumbar la aplicación
-    this.dispose();   
+                case "PACIENTE":
+                    // 🔑 CORREGIDO: Le pasamos de vuelta sus credenciales al menú del paciente
+                    MenuPaciente menuPaciente = new MenuPaciente(this.usuarioIdGlobal, this.correoPacienteGlobal);
+                    menuPaciente.setVisible(true);
+                    menuPaciente.setLocationRelativeTo(null);
+                    break;
+
+                case "DOCTOR":
+                    // 🔑 CORREGIDO: Le devolvemos el ID y el correo al MenuDoctor para que no se vacíe
+                    MenuDoctor menuDoc = new MenuDoctor(this.usuarioIdGlobal, this.correoPacienteGlobal);
+                    menuDoc.setVisible(true);
+                    menuDoc.setLocationRelativeTo(null);
+                    break;
+
+                default:
+                    MenuPrincipal login = new MenuPrincipal();
+                    login.setVisible(true);
+                    login.setLocationRelativeTo(null);
+                    break;
+            }
+        } else {
+            MenuPrincipal login = new MenuPrincipal();
+            login.setVisible(true);
+            login.setLocationRelativeTo(null);
+        }
+
+        // 2. Cierra la ventana de notificaciones sin tumbar la aplicación
+        this.dispose();
     }//GEN-LAST:event_btnVolverActionPerformed
 
     /**
