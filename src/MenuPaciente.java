@@ -25,6 +25,7 @@ public class MenuPaciente extends javax.swing.JFrame {
         //setIconImage(new ImageIcon(getClass().getResource("/img/ico.png")).getImage());
     }
 
+    // 2. Creamos un segundo constructor que reciba el correo desde el Login
     public MenuPaciente(int usuarioId, String correo) {
         initComponents();
 
@@ -37,7 +38,7 @@ public class MenuPaciente extends javax.swing.JFrame {
         cargarProximaCita();
     }
 
-    // 2. Creamos un segundo constructor que reciba el correo desde el Login
+    //CLASE 
     private void cargarProximaCita() {
 
         try {
