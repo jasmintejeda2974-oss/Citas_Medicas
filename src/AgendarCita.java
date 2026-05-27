@@ -374,17 +374,7 @@ public class AgendarCita extends javax.swing.JFrame {
 
 // EVENTO CAMBIO DE ESPECIALIDAD
     private void cbEspecialidadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbEspecialidadActionPerformed
-        // Cargamos doctores según especialidad seleccionada
-        CargarDatos.cargarDoctoresPorEspecialidad(
-                cbEspecialidad,
-                cbDoctor
-        );
-        // Actualizamos horas disponibles
-        CargarDatos.cargarHorasDisponibles(
-                cbDoctor,
-                cbFecha,
-                cbHora
-        );
+      
     }//GEN-LAST:event_cbEspecialidadActionPerformed
     // BOTÓN VOLVER
     private void btnVolverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVolverActionPerformed
