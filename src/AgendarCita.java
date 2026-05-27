@@ -5,61 +5,59 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
 import utils.CargarDatos;
+// Clase principal
 
 public class AgendarCita extends javax.swing.JFrame {
 
+    // Variables globales
     private int usuarioIdGlobal;
     private String correoPacienteGlobal = "";
 
-
+    // Constructor vacío
     public AgendarCita() {
         initComponents();
     }
 
-    // Constructor con Parámetro (El que usa tu MenuPaciente)
+    // Constructor que recibe el correo del paciente
+    // Este constructor es el que realmente se usa para agendar citas
     public AgendarCita(String correoPaciente) {
         initComponents();
         this.correoPacienteGlobal = correoPaciente;
         lblPaciente.setText(correoPaciente);
-        // =========================
-        // CARGAR SINTOMAS
-        // =========================
+
+        // Carga todos los síntomas desde la API al ComboBox de síntomas
         CargarDatos.cargarSintomas(cbSintoma);
-        // =========================
-        // CARGAR ESPECIALIDADES
-        // =========================
+
         CargarDatos.cargarEspecialidades(cbEspecialidad);
-        // =========================
-        // SELECCIONAR PRIMERA
-        // =========================
+
+        // Verificamos que existan especialidades cargadas
         if (cbEspecialidad.getItemCount() > 0) {
+
             cbEspecialidad.setSelectedIndex(0);
-            //CARGA
+
             CargarDatos.cargarDoctoresPorEspecialidad(
                     cbEspecialidad,
                     cbDoctor
             );
-            // 1. Limpiamos los ítems manuales que se pusieron en el diseño
+            // Limpiamos el ComboBox de fechas
             cbFecha.removeAllItems();
-            // 2. Obtenemos la fecha de hoy usando la API de Java 8+
+
             java.time.LocalDate hoy = java.time.LocalDate.now();
 
-            // 3. Agregamos de forma automática el día de hoy y los siguientes 3 días
+            // Agregamos 4 días disponibles empezando desde hoy
             for (int i = 0; i < 4; i++) {
                 cbFecha.addItem(hoy.plusDays(i).toString());
             }
         }
-        // =========================
-        // HORAS
-        // =========================
+
+        // CARGAR HORAS DISPONIBLES
         CargarDatos.cargarHorasDisponibles(
                 cbDoctor,
                 cbFecha,
                 cbHora
         );
-        // =========================
-        // EVENTO ESPECIALIDAD
-        // =========================
+
+        // EVENTO CAMBIO DE ESPECIALIDAD
         cbEspecialidad.addActionListener(new java.awt.event.ActionListener() {
 
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -74,9 +72,7 @@ public class AgendarCita extends javax.swing.JFrame {
                 );
             }
         });
-        // =========================
-        // EVENTO DOCTOR
-        // =========================
+        // EVENTO CAMBIO DE DOCTOR
         cbDoctor.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 CargarDatos.cargarHorasDisponibles(
@@ -87,9 +83,7 @@ public class AgendarCita extends javax.swing.JFrame {
             }
         });
 
-        // =========================
-        // EVENTO FECHA
-        // =========================
+        // EVENTO CAMBIO DE FECHA
         cbFecha.addActionListener(new java.awt.event.ActionListener() {
 
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -100,8 +94,10 @@ public class AgendarCita extends javax.swing.JFrame {
                 );
             }
         });
+        // Carga inicial de horas disponibles
         CargarDatos.cargarHorasDisponibles(cbDoctor, cbFecha, cbHora);
     }
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -273,42 +269,46 @@ public class AgendarCita extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
+    //Método
     private void btnAgendarCitaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgendarCitaActionPerformed
-try {
+        try {
+            // VALIDACIÓN DE DATOS
+            // Verificamos que el usuario haya seleccionado
+            // un doctor y un síntoma
             if (cbDoctor.getSelectedItem() == null || cbSintoma.getSelectedItem() == null) {
                 JOptionPane.showMessageDialog(this, "Selecciona doctor y síntoma");
                 return;
             }
-            // =========================
-            // HORA
-            // =========================
+
+            // OBTENER HORA SELECCIONADA
             String hora = cbHora.getSelectedItem().toString();
+            
+            // Si la hora tiene un formato corto
+            // agregamos un cero al inicio
             if (hora.length() == 7) {
                 hora = "0" + hora;
             }
+            
+            // CREAR FECHA COMPLETA
             String fecha = cbFecha.getSelectedItem().toString() + "T" + hora;
-            // =========================
-            // OBTENER PACIENTE REAL
-            // =========================
+
+            // OBTENER DATOS DEL USUARIO  
+            // Buscamos el usuario por correo en la API
             String respuestaUsuario = ApiCliente.get("https://shrubs-calzone-decency.ngrok-free.dev/usuarios/correo/" + correoPacienteGlobal);
             JSONObject usuarioJson = new JSONObject(respuestaUsuario);
             int idUsuario = usuarioJson.getInt("id");
-            // =========================
-            // OBTENER DOCTOR SELECCIONADO
-            // =========================
+          
+             // OBTENER ID DEL DOCTOR
             String docSel = cbDoctor.getSelectedItem().toString();
             int idDoctor = Integer.parseInt(docSel.split(" - ")[0]);
 
-            // =========================
-            // OBTENER SINTOMA
-            // =========================
+            // OBTENER ID DEL SÍNTOMA
             String seleccionado = cbSintoma.getSelectedItem().toString();
             int idSintoma = Integer.parseInt(seleccionado.split(" - ")[0]);
 
-            // =========================
-            // JSON CITA
-            // =========================
+            // CREAR JSON DE LA CITA
+            // Construimos manualmente el JSON
+            // que será enviado al backend
             String json = "{"
                     + "\"fecha\":\"" + fecha + "\","
                     + "\"usuario\":{\"id\":" + idUsuario + "},"
@@ -316,45 +316,44 @@ try {
                     + "\"sintoma\":{\"id\":" + idSintoma + "}"
                     + "}";
 
-            // =========================
-            // GUARDAR CITA
-            // =========================
+            // ENVIAR CITA AL BACKEND
+            // Enviamos petición POST para crear la cita
             String respuesta = ApiCliente.post("https://shrubs-calzone-decency.ngrok-free.dev/citas", json);
             System.out.println(respuesta);
 
-            // ========================================================
-            // NOTIFICACIONES AUTOMÁTICAS REPARADAS Y DINÁMICAS
-            // ========================================================
+            // OBTENER ID DE LA CITA CREADA
             JSONObject citaCreadaJson = new JSONObject(respuesta);
+            // Extraemos ID de la nueva cita
             int idCitaRecienCreada = citaCreadaJson.getInt("id");
+            
             String fechaNotif = java.time.LocalDateTime.now().toString();
 
-            // --- NOTIFICACIÓN 1: Al Paciente ---
+            // NOTIFICACIÓN PARA PACIENTE
             String jsonNotifPaciente = "{"
                     + "\"fecha\":\"" + fechaNotif + "\","
                     + "\"mensaje\":\"Tu cita médica ha sido agendada con éxito.\","
                     + "\"cita\":{\"id\":" + idCitaRecienCreada + "},"
                     + "\"usuario\":{\"id\":" + idUsuario + "}"
                     + "}";
+            // Enviamos notificación
             ApiCliente.post("https://shrubs-calzone-decency.ngrok-free.dev/notificaciones", jsonNotifPaciente);
 
-            // --- NOTIFICACIÓN 2: AL DOCTOR (AHORA 100% DINÁMICO DESDE LA API) ---
-            // Le pedimos a la API los datos del doctor usando su id de doctor directamente
+            // OBTENER DATOS DEL DOCTOR
             String respuestaDoctor = ApiCliente.get("https://shrubs-calzone-decency.ngrok-free.dev/doctores/" + idDoctor);
             JSONObject doctorJson = new JSONObject(respuestaDoctor);
-            
-            // Extraemos de forma automática el id del usuario que viene anidado en el doctor
+
+            // Obtenemos el ID REAL del usuario asociado al doctor
             int idUsuarioRealDelDoctor = doctorJson.getJSONObject("usuario").getInt("id");
 
+            // NOTIFICACIÓN PARA DOCTOR
             String jsonNotifDoctor = "{"
                     + "\"fecha\":\"" + fechaNotif + "\","
                     + "\"mensaje\":\"Tienes una nueva cita asignada con el paciente: " + correoPacienteGlobal + "\","
                     + "\"cita\":{\"id\":" + idCitaRecienCreada + "},"
-                    + "\"usuario\":{\"id\":" + idUsuarioRealDelDoctor + "}" // 🥼 ¡Dinámico para doctores nuevos!
+                    + "\"usuario\":{\"id\":" + idUsuarioRealDelDoctor + "}"
                     + "}";
             ApiCliente.post("https://shrubs-calzone-decency.ngrok-free.dev/notificaciones", jsonNotifDoctor);
 
-            // --- NOTIFICACIÓN 3: Al Administrador ---
             int idAdministrador = 1;
             String jsonNotifAdmin = "{"
                     + "\"fecha\":\"" + fechaNotif + "\","
@@ -362,8 +361,8 @@ try {
                     + "\"cita\":{\"id\":" + idCitaRecienCreada + "},"
                     + "\"usuario\":{\"id\":" + idAdministrador + "}"
                     + "}";
+            // Enviamos notificación
             ApiCliente.post("https://shrubs-calzone-decency.ngrok-free.dev/notificaciones", jsonNotifAdmin);
-            // ========================================================
 
             JOptionPane.showMessageDialog(this, "Cita agendada correctamente");
 
@@ -373,22 +372,23 @@ try {
         }
     }//GEN-LAST:event_btnAgendarCitaActionPerformed
 
-    
+// EVENTO CAMBIO DE ESPECIALIDAD
     private void cbEspecialidadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbEspecialidadActionPerformed
-CargarDatos.cargarDoctoresPorEspecialidad(
+        // Cargamos doctores según especialidad seleccionada
+        CargarDatos.cargarDoctoresPorEspecialidad(
                 cbEspecialidad,
                 cbDoctor
         );
-
+        // Actualizamos horas disponibles
         CargarDatos.cargarHorasDisponibles(
                 cbDoctor,
                 cbFecha,
                 cbHora
         );
     }//GEN-LAST:event_cbEspecialidadActionPerformed
-
+    // BOTÓN VOLVER
     private void btnVolverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVolverActionPerformed
-MenuPaciente menu = new MenuPaciente(usuarioIdGlobal, correoPacienteGlobal);
+        MenuPaciente menu = new MenuPaciente(usuarioIdGlobal, correoPacienteGlobal);
         menu.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_btnVolverActionPerformed
