@@ -338,7 +338,7 @@ try {
                     + "}";
             ApiCliente.post("https://shrubs-calzone-decency.ngrok-free.dev/notificaciones", jsonNotifPaciente);
 
-            // 🟢 --- NOTIFICACIÓN 2: AL DOCTOR (AHORA 100% DINÁMICO DESDE LA API) ---
+            // --- NOTIFICACIÓN 2: AL DOCTOR (AHORA 100% DINÁMICO DESDE LA API) ---
             // Le pedimos a la API los datos del doctor usando su id de doctor directamente
             String respuestaDoctor = ApiCliente.get("https://shrubs-calzone-decency.ngrok-free.dev/doctores/" + idDoctor);
             JSONObject doctorJson = new JSONObject(respuestaDoctor);
