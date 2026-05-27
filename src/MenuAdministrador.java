@@ -4,6 +4,7 @@ import javax.swing.table.DefaultTableModel;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import utils.ApiCliente;
+
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
@@ -14,8 +15,10 @@ import utils.ApiCliente;
  * @author Jazmín
  */
 public class MenuAdministrador extends javax.swing.JFrame {
-private int usuarioIdGlobal;
+
+    private int usuarioIdGlobal;
     private String correoAdminGlobal;
+
     /**
      * Creates new form MenuAdministrador
      */
@@ -23,6 +26,7 @@ private int usuarioIdGlobal;
         initComponents();
         tblVerDoc.setEnabled(false);
     }
+
     public MenuAdministrador(int usuarioId, String correo) {
         initComponents();
         this.usuarioIdGlobal = usuarioId;
@@ -32,38 +36,39 @@ private int usuarioIdGlobal;
     }
 
     private void cargarDoctores() {
-    try {
-        String respuesta = ApiCliente.get("https://shrubs-calzone-decency.ngrok-free.dev/doctores");
-        JSONArray array = new JSONArray(respuesta);
-        DefaultTableModel modelo = new DefaultTableModel();
+        try {
+            String respuesta = ApiCliente.get("https://shrubs-calzone-decency.ngrok-free.dev/doctores");
+            JSONArray array = new JSONArray(respuesta);
+            DefaultTableModel modelo = new DefaultTableModel();
 
-        modelo.addColumn("ID");
-        modelo.addColumn("Nombre");
-        modelo.addColumn("Especialidad");
-        modelo.addColumn("Horario");
-        modelo.addColumn("Consultorio");
+            modelo.addColumn("ID");
+            modelo.addColumn("Nombre");
+            modelo.addColumn("Especialidad");
+            modelo.addColumn("Horario");
+            modelo.addColumn("Consultorio");
 
-        for (int i = 0; i < array.length(); i++) {
-            JSONObject obj = array.getJSONObject(i);
+            for (int i = 0; i < array.length(); i++) {
+                JSONObject obj = array.getJSONObject(i);
 
-            String id = obj.getInt("id") + "";
-            String nombre = obj.getJSONObject("usuario").getString("nombre");
+                String id = obj.getInt("id") + "";
+                String nombre = obj.getJSONObject("usuario").getString("nombre");
 
-            String especialidad = obj.getJSONObject("especialidad").getString("nombre");
-            String horario = obj.getString("horario");
-            String consultorio = obj.getString("consultorio");
+                String especialidad = obj.getJSONObject("especialidad").getString("nombre");
+                String horario = obj.getString("horario");
+                String consultorio = obj.getString("consultorio");
 
-            modelo.addRow(new Object[]{id,nombre,especialidad, horario,consultorio});
+                modelo.addRow(new Object[]{id, nombre, especialidad, horario, consultorio});
+            }
+
+            tblVerDoc.setModel(modelo);
+            tblVerDoc.setEnabled(true);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error al cargar doctores");
         }
-
-        tblVerDoc.setModel(modelo);
-        tblVerDoc.setEnabled(true);
-
-    } catch (Exception e) {
-        e.printStackTrace();
-        JOptionPane.showMessageDialog(this, "Error al cargar doctores");
     }
-}
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -249,37 +254,37 @@ private int usuarioIdGlobal;
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnRegistrarDoctorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistrarDoctorActionPerformed
-     RegistroDoctor ventanaDoc = new RegistroDoctor();
-    ventanaDoc.setVisible(true);
-    ventanaDoc.setLocationRelativeTo(null); // Centra la ventana
-    this.dispose(); // Cierra el menú de administrador actual
+        RegistroDoctor ventanaDoc = new RegistroDoctor();
+        ventanaDoc.setVisible(true);
+        ventanaDoc.setLocationRelativeTo(null); // Centra la ventana
+        this.dispose(); // Cierra el menú de administrador actual
     }//GEN-LAST:event_btnRegistrarDoctorActionPerformed
 
     private void btnVerDoctoresActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVerDoctoresActionPerformed
-    cargarDoctores();
+        cargarDoctores();
     }//GEN-LAST:event_btnVerDoctoresActionPerformed
 
     private void btnCerrarSesionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCerrarSesionActionPerformed
-    MenuPrincipal login = new MenuPrincipal(); // Regresa al menú de inicio general
-    login.setVisible(true);
-    login.setLocationRelativeTo(null);
-    this.dispose();
+        MenuPrincipal login = new MenuPrincipal(); // Regresa al menú de inicio general
+        login.setVisible(true);
+        login.setLocationRelativeTo(null);
+        this.dispose();
     }//GEN-LAST:event_btnCerrarSesionActionPerformed
 
     private void btnNotificacionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNotificacionActionPerformed
-Notificaciones varNotif = new Notificaciones(1, "admin@sistema.com", "ADMIN");
-varNotif.setVisible(true);
-varNotif.setLocationRelativeTo(null);
-this.dispose();
+        Notificaciones varNotif = new Notificaciones(1, "admin@sistema.com", "ADMIN");
+        varNotif.setVisible(true);
+        varNotif.setLocationRelativeTo(null);
+        this.dispose();
     }//GEN-LAST:event_btnNotificacionActionPerformed
 
     private void btnAdministrarCActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAdministrarCActionPerformed
-    // Abrimos la pantalla de administración de citas
-    AdministrarCitas panelCitas = new AdministrarCitas();
-    panelCitas.setVisible(true);
-    
-    // Cerramos el menú actual para que no se encimen las ventanas
-    this.dispose();
+        // Abrimos la pantalla de administración de citas
+        AdministrarCitas panelCitas = new AdministrarCitas();
+        panelCitas.setVisible(true);
+
+        // Cerramos el menú actual para que no se encimen las ventanas
+        this.dispose();
     }//GEN-LAST:event_btnAdministrarCActionPerformed
 
     /**
