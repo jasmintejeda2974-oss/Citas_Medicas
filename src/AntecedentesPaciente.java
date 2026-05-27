@@ -7,55 +7,70 @@ import utils.ApiCliente;
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-
 /**
  *
  * @author quile
  */
+// CLASE PRINCIPAL
 public class AntecedentesPaciente extends javax.swing.JFrame {
-private int usuarioIdGlobal;
+
+    // VARIABLES GLOBALES
+    private int usuarioIdGlobal;
     private String correoPacienteGlobal;
-    /**
-     * Creates new form AntecedentesPaciente
-     */
+
+    // CONSTRUCTOR VACÍO
     public AntecedentesPaciente() {
         initComponents();
     }
-    
-public AntecedentesPaciente(int usuarioId, String correoPaciente) {
+
+    // CONSTRUCTOR PRINCIPAL
+    // Donde recibe ID del usuario y Correo del paciente
+    public AntecedentesPaciente(int usuarioId, String correoPaciente) {
         initComponents();
         this.usuarioIdGlobal = usuarioId;
         this.correoPacienteGlobal = correoPaciente;
-        cargarAntecedentes(); // Intenta buscar datos existentes al abrir
+        // Intentamos cargar antecedentes existentes
+        // desde la base de datos
+        cargarAntecedentes();
     }
 
-private void cargarAntecedentes() {
-    if (this.usuarioIdGlobal <= 0) {
-        System.out.println("Aviso: ID de usuario inválido.");
-        return;
-    }
-
-    try {
-        String url = "https://shrubs-calzone-decency.ngrok-free.dev/historial/usuario/" + this.usuarioIdGlobal;
-        String respuesta = ApiCliente.get(url);
-
-        // Si el servidor responde con datos válidos
-        if (respuesta != null && !respuesta.trim().isEmpty() && !respuesta.contains("404")) {
-            org.json.JSONObject obj = new org.json.JSONObject(respuesta);
-
-            txtTipoSangre.setText(obj.optString("tipoSangre", ""));
-            txtAlergias.setText(obj.optString("alergias", ""));
-            txtAntecedentes.setText(obj.optString("antecedentes", ""));
-            txtEnfermedades.setText(obj.optString("enfermedadesCronicas", ""));
-            txtMedicamento.setText(obj.optString("medicamentos", ""));
-            System.out.println("Antecedentes cargados con éxito.");
+    // MÉTODO CARGAR ANTECEDENTES
+    // Este método busca si el paciente ya tiene
+    // antecedentes registrados en la base de datos
+    private void cargarAntecedentes() {
+        // VALIDACIÓN DEL ID
+        if (this.usuarioIdGlobal <= 0) {
+            System.out.println("Aviso: ID de usuario inválido.");
+            return;
         }
-    } catch (Exception e) {
-        // Capturamos el FileNotFoundException (404) aquí para que la app no explote.
-        // Imprimimos un mensaje amigable en la consola en lugar de todo el error rojo.
-        System.out.println("Nota: El usuario no tiene antecedentes previos en la BD. Listo para crear registro nuevo.");
+
+        try {
+
+            // Creamos la URL para consultar historial clínico
+            String url = "https://shrubs-calzone-decency.ngrok-free.dev/historial/usuario/" + this.usuarioIdGlobal;
+            
+            // PETICIÓN GET AL BACKEND
+            // Consultamos antecedentes del usuario
+            String respuesta = ApiCliente.get(url);
+
+            // VALIDAR RESPUESTA
+            if (respuesta != null && !respuesta.trim().isEmpty() && !respuesta.contains("404")) {
+                // CONVERTIR RESPUESTA A JSON
+                org.json.JSONObject obj = new org.json.JSONObject(respuesta);
+
+                // LLENAR LOS CAMPOS DEL FORMULARIO
+                txtTipoSangre.setText(obj.optString("tipoSangre", ""));
+                txtAlergias.setText(obj.optString("alergias", ""));
+                txtAntecedentes.setText(obj.optString("antecedentes", ""));
+                txtEnfermedades.setText(obj.optString("enfermedadesCronicas", ""));
+                txtMedicamento.setText(obj.optString("medicamentos", ""));
+                System.out.println("Antecedentes cargados con éxito.");
+            }
+        } catch (Exception e) {
+
+            System.out.println("Nota: El usuario no tiene antecedentes previos en la BD. Listo para crear registro nuevo.");
+        }
     }
-}
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -319,20 +334,29 @@ private void cargarAntecedentes() {
     private void btnVolverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVolverActionPerformed
 
     }//GEN-LAST:event_btnVolverActionPerformed
-
+    //Método
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
-       try {
+        try {
+            // CREAR OBJETO JSON
             JSONObject json = new JSONObject();
+            
+            // AGREGAR DATOS AL JSON
             json.put("tipoSangre", txtTipoSangre.getText().trim());
             json.put("alergias", txtAlergias.getText().trim());
             json.put("antecedentes", txtAntecedentes.getText().trim());
             json.put("enfermedadesCronicas", txtEnfermedades.getText().trim());
             json.put("medicamentos", txtMedicamento.getText().trim());
 
-            // Enviamos el JSON al controlador inteligente en IntelliJ
+            // CREAR URL DEL SERVIDOR
+            // URL donde se guardarán los antecedentes
             String url = "https://shrubs-calzone-decency.ngrok-free.dev/historial/guardar/" + this.usuarioIdGlobal;
+            
+            // ENVIAR DATOS AL BACKEND
+            // Enviamos petición POST al servidor
             String respuesta = ApiCliente.post(url, json.toString());
-
+ 
+            // VALIDAR RESPUESTA DEL SERVIDOR
+            // Verificamos si se guardó correctamente
             if (respuesta != null && !respuesta.contains("Error")) {
                 JOptionPane.showMessageDialog(this, "Antecedentes médicos actualizados con éxito.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
             } else {
@@ -343,9 +367,10 @@ private void cargarAntecedentes() {
             JOptionPane.showMessageDialog(this, "Error al conectar con el servidor.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_btnGuardarActionPerformed
-
+    //Método
     private void btnVolver1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVolver1ActionPerformed
-       MenuPaciente mp = new MenuPaciente(this.usuarioIdGlobal, this.correoPacienteGlobal);
+        // Creamos una nueva instancia del menú paciente
+        MenuPaciente mp = new MenuPaciente(this.usuarioIdGlobal, this.correoPacienteGlobal);
         mp.setVisible(true);
         mp.setLocationRelativeTo(null);
         this.dispose();
