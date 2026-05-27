@@ -12,22 +12,24 @@ import javax.swing.table.DefaultTableModel;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import utils.ApiCliente;
-
+//CLASE
 public class AdministrarCitas extends javax.swing.JFrame {
 
     /**
      * Creates new form AdministrarCitas
      */
+    //CONSTRUCTOR
     public AdministrarCitas() {
         initComponents();
         setLocationRelativeTo(null);
         cargarCitas();
     }
+    //METODO
 private void cargarCitas() {
         try {
-            // Traemos todas las citas generales del sistema
+            //Aquí tu programa hace una petición HTTP GET.
             String respuesta = ApiCliente.get("https://shrubs-calzone-decency.ngrok-free.dev/citas");
-
+            //VALIDACIÓN
             if (respuesta == null || respuesta.trim().isEmpty() || respuesta.startsWith("Error")) {
                 limpiarTabla();
                 return;
