@@ -36,33 +36,39 @@ public class AdministrarCitas extends javax.swing.JFrame {
                 limpiarTabla();
                 return;
             }
-
+            //Convierte el texto JSON en un arreglo JSON manejable.
             JSONArray array = new JSONArray(respuesta);
             DefaultTableModel modelo = (DefaultTableModel) txtCitas.getModel();
-            modelo.setRowCount(0); // Limpiamos datos viejos
+            modelo.setRowCount(0); // Limpiamos datos viejos borra filas anteriores para eviatar duplicado
 
+            //Recorre TODAS las citas.
             for (int i = 0; i < array.length(); i++) {
+                //Obtiene una cita individual del JSON.
                 JSONObject cita = array.getJSONObject(i);
 
+                //Obtiene el id.
                 int id = cita.getInt("id");
                 String fecha = cita.optString("fecha", "Sin fecha");
                 String estado = cita.optString("estado", "PENDIENTE");
 
-                // Extracción segura del Paciente
+                // Valor por defecto.
                 String paciente = "Desconocido";
+                //Verifica si existe usuario
                 if (cita.has("usuario") && !cita.isNull("usuario")) {
                     paciente = cita.getJSONObject("usuario").optString("nombre", "Desconocido");
                 }
 
-                // ️ Extracción súper segura del Doctor (evita que la tabla se quede en blanco si es null)
+                //Valor por defecto.
                 String doctor = "No asignado";
+                //Porque a veces una cita NO tiene doctor.
                 if (cita.has("doctor") && !cita.isNull("doctor")) {
                     JSONObject docObj = cita.getJSONObject("doctor");
+                    //Obtiene usuario del doctor
                     if (docObj.has("usuario") && !docObj.isNull("usuario")) {
                         doctor = docObj.getJSONObject("usuario").optString("nombre", "No asignado");
                     }
                 }
-
+                //AGREGAR FILA A LA TABLA
                 modelo.addRow(new Object[]{id, paciente, doctor, fecha, estado});
             }
 
@@ -72,6 +78,7 @@ public class AdministrarCitas extends javax.swing.JFrame {
         }
     }
 
+    //MÉTODO 
     private void limpiarTabla() {
         DefaultTableModel modelo = (DefaultTableModel) txtCitas.getModel();
         modelo.setRowCount(0);
@@ -225,23 +232,26 @@ public class AdministrarCitas extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
+    // Método 
     private void btnVolverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVolverActionPerformed
         MenuAdministrador menu = new MenuAdministrador();
         menu.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_btnVolverActionPerformed
-
+    // Método
     private void btnFinalizadaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFinalizadaActionPerformed
         try {
+            // Obtenemos la fila seleccionada de la tabla
             int fila = txtCitas.getSelectedRow();
+            // Verificamos si el usuario seleccionó una cita
             if (fila == -1) {
                 JOptionPane.showMessageDialog(this, "Por favor, seleccione una cita de la tabla.");
-                return;
+                return;  
             }
+            // Obtenemos el ID de la cita desde la columna 0 de la tabla
             int id = Integer.parseInt(txtCitas.getValueAt(fila, 0).toString());
 
-            //  URL  /citas/estado/{id}/FINALIZADA
+             // Enviamos una petición PUT al backend para cambiar el estado a FINALIZADA
             ApiCliente.put("https://shrubs-calzone-decency.ngrok-free.dev/citas/estado/" + id + "/FINALIZADA");
 
             JOptionPane.showMessageDialog(this, "Cita marcada como Finalizada.");
@@ -251,17 +261,20 @@ public class AdministrarCitas extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Error al finalizar la cita.");
         }
     }//GEN-LAST:event_btnFinalizadaActionPerformed
-
+    // Método
     private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
         try {
+             // Obtenemos la fila seleccionada de la tabla
             int fila = txtCitas.getSelectedRow();
+             // Validamos que exista una cita seleccionada
             if (fila == -1) {
                 JOptionPane.showMessageDialog(this, "Por favor, seleccione una cita de la tabla.");
                 return;
             }
+            // Obtenemos el ID de la cita seleccionada
             int id = Integer.parseInt(txtCitas.getValueAt(fila, 0).toString());
 
-            //  URL  /citas/estado/{id}/CANCELADA
+             // Enviamos una petición PUT para cambiar el estado de la cita a CANCELADA
             ApiCliente.put("https://shrubs-calzone-decency.ngrok-free.dev/citas/estado/" + id + "/CANCELADA");
 
             JOptionPane.showMessageDialog(this, "Cita Cancelada con éxito.");
@@ -271,17 +284,20 @@ public class AdministrarCitas extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "Error al cancelar la cita.");
         }
     }//GEN-LAST:event_btnCancelarActionPerformed
-
+    // Método
     private void btnConfirmarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConfirmarActionPerformed
         try {
+            // Obtenemos la fila seleccionada de la tabla
             int fila = txtCitas.getSelectedRow();
+            // Validamos que el usuario haya seleccionado una cita
             if (fila == -1) {
                 JOptionPane.showMessageDialog(this, "Por favor, seleccione una cita de la tabla.");
                 return;
             }
+            // Obtenemos el ID de la cita seleccionada
             int id = Integer.parseInt(txtCitas.getValueAt(fila, 0).toString());
 
-            // /citas/estado/{id}/CONFIRMADA
+            // Enviamos petición PUT al backend para confirmar la cita
             ApiCliente.put("https://shrubs-calzone-decency.ngrok-free.dev/citas/estado/" + id + "/CONFIRMADA");
 
             JOptionPane.showMessageDialog(this, "¡Cita Confirmada con éxito!");
