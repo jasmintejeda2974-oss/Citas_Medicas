@@ -65,35 +65,49 @@ public class CitasDoctor extends javax.swing.JFrame {
             // Consultamos las citas del doctor
             String respuesta = ApiCliente.get(url);
 
-            // PETICIÓN GET AL BACKEND
+            // Verificamos que la respuesta no venga vacía
             if (respuesta == null || respuesta.trim().isEmpty()) {
                 System.out.println("No se encontraron citas para este doctor.");
                 return;
             }
 
+            // Convertimos respuesta en JSONArray
             JSONArray array = new JSONArray(respuesta);
+            // CREAR MODELO DE TABLA
             DefaultTableModel modelo = new DefaultTableModel();
 
+            // CREAR COLUMNAS
             modelo.addColumn("ID");
             modelo.addColumn("Paciente");
             modelo.addColumn("Fecha");
             modelo.addColumn("Síntoma");
             modelo.addColumn("Estado");
 
+            // Se usa para verificar si la cita
+            // ya pasó y debe mostrarse como finalizada
             java.time.LocalDateTime ahora = java.time.LocalDateTime.now();
 
+            // RECORRER TODAS LAS CITAS
             for (int i = 0; i < array.length(); i++) {
+                // OBTENER OBJETO JSON DE CADA CITA
                 JSONObject obj = array.getJSONObject(i);
+                
+                // EXTRAER DATOS DE LA CITA
                 String id = obj.getInt("id") + "";
                 String paciente = obj.getJSONObject("usuario").getString("nombre");
                 String fechaOriginal = obj.getString("fecha");
                 String sintoma = obj.getJSONObject("sintoma").getString("nombre");
                 String estado = obj.getString("estado");
 
+                // VALIDAR SI LA CITA YA PASÓ
                 try {
+                    // CONVERTIR FECHA A FORMATO PARSEABLE
+                    // Reemplazamos espacio por T
+                    // para convertirla a LocalDateTime
                     String fechaParseable = fechaOriginal.replace(" ", "T");
                     java.time.LocalDateTime fechaCita = java.time.LocalDateTime.parse(fechaParseable);
 
+                    // VERIFICAR SI LA CITA YA TERMINÓ
                     if (fechaCita.isBefore(ahora)) {
                         if (!estado.equalsIgnoreCase("CANCELADA")) {
                             estado = "FINALIZADA";
