@@ -38,7 +38,7 @@ public MenuDoctor(int usuarioId, String correo) {
         
         jLabel3.setText("BIENVENIDO DOCTOR"); 
         
-        // 📅 Llamamos al método para cargar la siguiente cita de manera segura
+        //  Llamamos al método para cargar la siguiente cita de manera segura
         obtenerProximaCita();
     }
 
