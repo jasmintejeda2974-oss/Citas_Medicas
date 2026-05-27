@@ -10,92 +10,92 @@ import javax.swing.table.DefaultTableModel;
 
 public class HistorialPaciente extends javax.swing.JFrame {
 
-     private int usuarioIdGlobal;
+    private int usuarioIdGlobal;
     private String correoPacienteGlobal = "";
 
-    /**
-     * Creates new form HistorialClinico
-     */
+  
     public HistorialPaciente() {
         initComponents();
         limpiarTabla();
     }
 //se usa unicamente  cuando el doctor entra al historial
     //guarda los datos del doctor en las variables globales 
+
     public HistorialPaciente(int idDoctor, String correoDoc) {
         initComponents();
         this.usuarioIdGlobal = idDoctor;
         // Al guardar el correo del doctor aquí, el botón Volver sabrá a dónde regresar
-        this.correoPacienteGlobal = correoDoc; 
+        this.correoPacienteGlobal = correoDoc;
         limpiarTabla();
     }
+
     //Se usa cuando el paciente inicia sesion  y quiere ver su historial 
- public HistorialPaciente(String correoPaciente) {
+    public HistorialPaciente(String correoPaciente) {
         initComponents();
         this.correoPacienteGlobal = correoPaciente;
         // Colocamos el correo en el buscador automáticamente si ya lo conocemos
         txtCorreoBuscar.setText(correoPaciente);
         cargarHistorial(correoPaciente);
     }
-    
 
- public void cargarHistorial(String correoTarget) {
-    // Control de seguridad: si el campo está vacío, detenemos la petición
-    if (correoTarget == null || correoTarget.trim().isEmpty()) {
-        JOptionPane.showMessageDialog(this, "Por favor, introduce un correo válido para buscar.");
-        return;
-    }
-
-    try {
-        //Cambiamos el endpoint para apuntar al controlador del historial/antecedentes
-        String url = "https://shrubs-calzone-decency.ngrok-free.dev/historial/usuario/correo/" + correoTarget.trim();
-        String respuesta = ApiCliente.get(url);
-
-        DefaultTableModel model = (DefaultTableModel) THistorial.getModel();
-        model.setRowCount(0); // Reseteamos la tabla siempre antes de buscar
-
-        // Si el backend responde vacío o da error porque el paciente no tiene historial clínico creado aún
-        if (respuesta == null || respuesta.trim().isEmpty() || respuesta.startsWith("Error")) {
-            JOptionPane.showMessageDialog(this, "El paciente con correo '" + correoTarget + "' aún no tiene un historial clínico registrado.");
+    public void cargarHistorial(String correoTarget) {
+        // Control de seguridad: si el campo está vacío, detenemos la petición
+        if (correoTarget == null || correoTarget.trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Por favor, introduce un correo válido para buscar.");
             return;
         }
 
-        // Como un usuario solo tiene UN historial clínico único, el backend devuelve un OBJECT {} no un ARRAY []
-        JSONObject obj = new JSONObject(respuesta);
+        try {
+            //Cambiamos el endpoint para apuntar al controlador del historial/antecedentes
+            String url = "https://shrubs-calzone-decency.ngrok-free.dev/historial/usuario/correo/" + correoTarget.trim();
+            String respuesta = ApiCliente.get(url);
 
-        // Extraemos de forma segura cada propiedad mapeándola con las columnas nuevas
-        //intenta leer el campo  si en la base esta bacio o nulo no de error el sistema y solo muestra el esos mesnajes 
-        String tipoSangre = obj.optString("tipoSangre", "No registrado");
-        String alergias = obj.optString("alergias", "Ninguna");
-        String antecedentes = obj.optString("antecedentes", "Ninguno");
-        String enfermedades = obj.optString("enfermedadesCronicas", "Ninguna");
-        String medicamentos = obj.optString("medicamentos", "Ninguno");
+            DefaultTableModel model = (DefaultTableModel) THistorial.getModel();
+            model.setRowCount(0); // Reseteamos la tabla siempre antes de buscar
 
-        // Agregamos la fila con los datos clínicos reales del paciente
-        model.addRow(new Object[]{
-            tipoSangre,
-            alergias,
-            antecedentes,
-            enfermedades,
-            medicamentos
-        });
+            // Si el backend responde vacío o da error porque el paciente no tiene historial clínico creado aún
+            if (respuesta == null || respuesta.trim().isEmpty() || respuesta.startsWith("Error")) {
+                JOptionPane.showMessageDialog(this, "El paciente con correo '" + correoTarget + "' aún no tiene un historial clínico registrado.");
+                return;
+            }
 
-    } catch (Exception e) {
-        e.printStackTrace();
-        // Si el servidor arroja un 404 (FileNotFoundException), significa que el registro no existe
-        if (e.toString().contains("FileNotFoundException")) {
-            JOptionPane.showMessageDialog(this, "No se encontró historial clínico para este correo. Verifique si el paciente ya lo registró.");
-        } else {
-            JOptionPane.showMessageDialog(this, "Error al comunicar con el servidor de historiales médicos.");
+            // Como un usuario solo tiene UN historial clínico único, el backend devuelve un OBJECT {} no un ARRAY []
+            JSONObject obj = new JSONObject(respuesta);
+
+            // Extraemos de forma segura cada propiedad mapeándola con las columnas nuevas
+            //intenta leer el campo  si en la base esta bacio o nulo no de error el sistema y solo muestra el esos mesnajes 
+            String tipoSangre = obj.optString("tipoSangre", "No registrado");
+            String alergias = obj.optString("alergias", "Ninguna");
+            String antecedentes = obj.optString("antecedentes", "Ninguno");
+            String enfermedades = obj.optString("enfermedadesCronicas", "Ninguna");
+            String medicamentos = obj.optString("medicamentos", "Ninguno");
+
+            // Agregamos la fila con los datos clínicos reales del paciente
+            model.addRow(new Object[]{
+                tipoSangre,
+                alergias,
+                antecedentes,
+                enfermedades,
+                medicamentos
+            });
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            // Si el servidor arroja un 404 (FileNotFoundException), significa que el registro no existe
+            if (e.toString().contains("FileNotFoundException")) {
+                JOptionPane.showMessageDialog(this, "No se encontró historial clínico para este correo. Verifique si el paciente ya lo registró.");
+            } else {
+                JOptionPane.showMessageDialog(this, "Error al comunicar con el servidor de historiales médicos.");
+            }
+            limpiarTabla();
         }
-        limpiarTabla();
     }
-}
 
     private void limpiarTabla() {
         DefaultTableModel model = (DefaultTableModel) THistorial.getModel();
         model.setRowCount(0);
     }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -233,79 +233,80 @@ public class HistorialPaciente extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnVolverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVolverActionPerformed
-try {
-        //REVISIÓN INTELIGENTE DE ROL: 
-        // Si el correo contiene la palabra doctor o si vino del constructor de doctor (donde idDoctor se guarda en usuarioIdGlobal)
-        // Pero para asegurar, si entramos desde el MenuPaciente, el idDoctor se queda en 0.
-        if (this.usuarioIdGlobal > 0) {
-            // Si tiene ID de doctor asignado, regresa al menú del doctor
-            MenuDoctor md = new MenuDoctor(this.usuarioIdGlobal, this.correoPacienteGlobal); 
-            md.setVisible(true);
-        } else {
-            //SI ES PACIENTE: Regresa directo a su menú correspondiente pasándole sus datos reales
-            // Usamos el ID 0 temporal o el id global si lo tuvieras, y el correo que cargó la pantalla
-            MenuPaciente mp = new MenuPaciente(0, this.correoPacienteGlobal);
+        try {
+            //REVISIÓN INTELIGENTE DE ROL: 
+            // Si el correo contiene la palabra doctor o si vino del constructor de doctor (donde idDoctor se guarda en usuarioIdGlobal)
+            // Pero para asegurar, si entramos desde el MenuPaciente, el idDoctor se queda en 0.
+            if (this.usuarioIdGlobal > 0) {
+                // Si tiene ID de doctor asignado, regresa al menú del doctor
+                MenuDoctor md = new MenuDoctor(this.usuarioIdGlobal, this.correoPacienteGlobal);
+                md.setVisible(true);
+            } else {
+                //SI ES PACIENTE: Regresa directo a su menú correspondiente pasándole sus datos reales
+                // Usamos el ID 0 temporal o el id global si lo tuvieras, y el correo que cargó la pantalla
+                MenuPaciente mp = new MenuPaciente(0, this.correoPacienteGlobal);
+                mp.setVisible(true);
+            }
+            this.dispose();
+        } catch (Exception e) {
+            // Protección por si algo falla, regresa al Login para no congelar el software
+            MenuPrincipal mp = new MenuPrincipal();
             mp.setVisible(true);
+            this.dispose();
         }
-        this.dispose();
-    } catch (Exception e) {
-        // Protección por si algo falla, regresa al Login para no congelar el software
-        MenuPrincipal mp = new MenuPrincipal();
-        mp.setVisible(true);
-        this.dispose();
-    }
     }//GEN-LAST:event_btnVolverActionPerformed
 
     private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
-String entrada = txtCorreoBuscar.getText().trim();
-    
-    if (entrada.isEmpty()) {
-        JOptionPane.showMessageDialog(this, "Por favor, introduce un dato para buscar.");
-        return;
-    }
-    
-    try {
-        //hace la convercion a un numero cuando escribe el ID
-        int idBuscar = Integer.parseInt(entrada);
-        
-        // Si es número, armamos la URL limpia por ID sin romper tu método original
-        String url = "https://shrubs-calzone-decency.ngrok-free.dev/historial/usuario/" + idBuscar;
-        System.out.println("Buscando por ID en: " + url);
-        
-        String respuesta = utils.ApiCliente.get(url);
-        procesarYClasificarHistorial(respuesta);
-        
-    } catch (NumberFormatException e) {
-        //Si contiene letras (es un correo como natalia@gmail.com), 
-        // llamamos a tu método de toda la vida. ¡Tus otras ventanas seguirán felices!
-        cargarHistorial(entrada);
-    }
-    }//GEN-LAST:event_btnBuscarActionPerformed
+        String entrada = txtCorreoBuscar.getText().trim();
 
-    private void procesarYClasificarHistorial(String respuesta) {
-    try {
-        DefaultTableModel model = (DefaultTableModel) THistorial.getModel();
-        model.setRowCount(0);
-
-        if (respuesta == null || respuesta.trim().isEmpty() || respuesta.startsWith("Error")) {
-            JOptionPane.showMessageDialog(this, "El paciente no tiene un historial clínico registrado aún.");
+        if (entrada.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Por favor, introduce un dato para buscar.");
             return;
         }
 
-        org.json.JSONObject obj = new org.json.JSONObject(respuesta);
-        
-        model.addRow(new Object[]{
-            obj.optString("tipoSangre", "No registrado"),
-            obj.optString("alergias", "Ninguna"),
-            obj.optString("antecedentes", "Ninguno"),
-            obj.optString("enfermedadesCronicas", "Ninguna"),
-            obj.optString("medicamentos", "Ninguno")
-        });
-    } catch (Exception ex) {
-        ex.printStackTrace();
-        JOptionPane.showMessageDialog(this, "Error al procesar los datos clínicos.");
+        try {
+            //hace la convercion a un numero cuando escribe el ID
+            int idBuscar = Integer.parseInt(entrada);
+
+            // Si es número, armamos la URL limpia por ID sin romper tu método original
+            String url = "https://shrubs-calzone-decency.ngrok-free.dev/historial/usuario/" + idBuscar;
+            System.out.println("Buscando por ID en: " + url);
+
+            String respuesta = utils.ApiCliente.get(url);
+            procesarYClasificarHistorial(respuesta);
+
+        } catch (NumberFormatException e) {
+            //Si contiene letras (es un correo como natalia@gmail.com), 
+            // llamamos a tu método de toda la vida. ¡Tus otras ventanas seguirán felices!
+            cargarHistorial(entrada);
+        }
+    }//GEN-LAST:event_btnBuscarActionPerformed
+
+    private void procesarYClasificarHistorial(String respuesta) {
+        try {
+            DefaultTableModel model = (DefaultTableModel) THistorial.getModel();
+            model.setRowCount(0);
+
+            if (respuesta == null || respuesta.trim().isEmpty() || respuesta.startsWith("Error")) {
+                JOptionPane.showMessageDialog(this, "El paciente no tiene un historial clínico registrado aún.");
+                return;
+            }
+
+            org.json.JSONObject obj = new org.json.JSONObject(respuesta);
+
+            model.addRow(new Object[]{
+                obj.optString("tipoSangre", "No registrado"),
+                obj.optString("alergias", "Ninguna"),
+                obj.optString("antecedentes", "Ninguno"),
+                obj.optString("enfermedadesCronicas", "Ninguna"),
+                obj.optString("medicamentos", "Ninguno")
+            });
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error al procesar los datos clínicos.");
+        }
     }
-}
+
     /**
      * @param args the command line arguments
      */
