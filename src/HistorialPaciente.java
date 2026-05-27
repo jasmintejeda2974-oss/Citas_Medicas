@@ -20,7 +20,8 @@ public class HistorialPaciente extends javax.swing.JFrame {
         initComponents();
         limpiarTabla();
     }
-
+//se usa unicamente  cuando el doctor entra al historial
+    //guarda los datos del doctor en las variables globales 
     public HistorialPaciente(int idDoctor, String correoDoc) {
         initComponents();
         this.usuarioIdGlobal = idDoctor;
@@ -28,6 +29,7 @@ public class HistorialPaciente extends javax.swing.JFrame {
         this.correoPacienteGlobal = correoDoc; 
         limpiarTabla();
     }
+    //Se usa cuando el paciente inicia sesion  y quiere ver su historial 
  public HistorialPaciente(String correoPaciente) {
         initComponents();
         this.correoPacienteGlobal = correoPaciente;
@@ -45,7 +47,7 @@ public class HistorialPaciente extends javax.swing.JFrame {
     }
 
     try {
-        // 🏥 Cambiamos el endpoint para apuntar al controlador del historial/antecedentes
+        //Cambiamos el endpoint para apuntar al controlador del historial/antecedentes
         String url = "https://shrubs-calzone-decency.ngrok-free.dev/historial/usuario/correo/" + correoTarget.trim();
         String respuesta = ApiCliente.get(url);
 
@@ -58,10 +60,11 @@ public class HistorialPaciente extends javax.swing.JFrame {
             return;
         }
 
-        // 💡 Como un usuario solo tiene UN historial clínico único, el backend devuelve un OBJECT {} no un ARRAY []
+        // Como un usuario solo tiene UN historial clínico único, el backend devuelve un OBJECT {} no un ARRAY []
         JSONObject obj = new JSONObject(respuesta);
 
         // Extraemos de forma segura cada propiedad mapeándola con las columnas nuevas
+        //intenta leer el campo  si en la base esta bacio o nulo no de error el sistema y solo muestra el esos mesnajes 
         String tipoSangre = obj.optString("tipoSangre", "No registrado");
         String alergias = obj.optString("alergias", "Ninguna");
         String antecedentes = obj.optString("antecedentes", "Ninguno");
@@ -231,7 +234,7 @@ public class HistorialPaciente extends javax.swing.JFrame {
 
     private void btnVolverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVolverActionPerformed
 try {
-        // 🔍 REVISIÓN INTELIGENTE DE ROL: 
+        //REVISIÓN INTELIGENTE DE ROL: 
         // Si el correo contiene la palabra doctor o si vino del constructor de doctor (donde idDoctor se guarda en usuarioIdGlobal)
         // Pero para asegurar, si entramos desde el MenuPaciente, el idDoctor se queda en 0.
         if (this.usuarioIdGlobal > 0) {
@@ -239,7 +242,7 @@ try {
             MenuDoctor md = new MenuDoctor(this.usuarioIdGlobal, this.correoPacienteGlobal); 
             md.setVisible(true);
         } else {
-            // 🚀 SI ES PACIENTE: Regresa directo a su menú correspondiente pasándole sus datos reales
+            //SI ES PACIENTE: Regresa directo a su menú correspondiente pasándole sus datos reales
             // Usamos el ID 0 temporal o el id global si lo tuvieras, y el correo que cargó la pantalla
             MenuPaciente mp = new MenuPaciente(0, this.correoPacienteGlobal);
             mp.setVisible(true);
@@ -262,10 +265,10 @@ String entrada = txtCorreoBuscar.getText().trim();
     }
     
     try {
-        // 🤔 ¿Es un número puro? (Como el 1 o el 6 que salían en tu error)
+        //hace la convercion a un numero cuando escribe el ID
         int idBuscar = Integer.parseInt(entrada);
         
-        // 🚀 Si es número, armamos la URL limpia por ID sin romper tu método original
+        // Si es número, armamos la URL limpia por ID sin romper tu método original
         String url = "https://shrubs-calzone-decency.ngrok-free.dev/historial/usuario/" + idBuscar;
         System.out.println("Buscando por ID en: " + url);
         
@@ -273,7 +276,7 @@ String entrada = txtCorreoBuscar.getText().trim();
         procesarYClasificarHistorial(respuesta);
         
     } catch (NumberFormatException e) {
-        // 📧 Si contiene letras (es un correo como natalia@gmail.com), 
+        //Si contiene letras (es un correo como natalia@gmail.com), 
         // llamamos a tu método de toda la vida. ¡Tus otras ventanas seguirán felices!
         cargarHistorial(entrada);
     }
