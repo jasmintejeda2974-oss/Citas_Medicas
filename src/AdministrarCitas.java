@@ -13,6 +13,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import utils.ApiCliente;
 //CLASE
+
 public class AdministrarCitas extends javax.swing.JFrame {
 
     /**
@@ -25,7 +26,8 @@ public class AdministrarCitas extends javax.swing.JFrame {
         cargarCitas();
     }
     //METODO
-private void cargarCitas() {
+
+    private void cargarCitas() {
         try {
             //Aquí tu programa hace una petición HTTP GET.
             String respuesta = ApiCliente.get("https://shrubs-calzone-decency.ngrok-free.dev/citas");
@@ -41,17 +43,17 @@ private void cargarCitas() {
 
             for (int i = 0; i < array.length(); i++) {
                 JSONObject cita = array.getJSONObject(i);
-                
+
                 int id = cita.getInt("id");
                 String fecha = cita.optString("fecha", "Sin fecha");
                 String estado = cita.optString("estado", "PENDIENTE");
-                
+
                 // Extracción segura del Paciente
                 String paciente = "Desconocido";
                 if (cita.has("usuario") && !cita.isNull("usuario")) {
                     paciente = cita.getJSONObject("usuario").optString("nombre", "Desconocido");
                 }
-                
+
                 // ️ Extracción súper segura del Doctor (evita que la tabla se quede en blanco si es null)
                 String doctor = "No asignado";
                 if (cita.has("doctor") && !cita.isNull("doctor")) {
@@ -69,7 +71,8 @@ private void cargarCitas() {
             JOptionPane.showMessageDialog(this, "Error al cargar las citas del servidor.");
         }
     }
-private void limpiarTabla() {
+
+    private void limpiarTabla() {
         DefaultTableModel modelo = (DefaultTableModel) txtCitas.getModel();
         modelo.setRowCount(0);
     }
@@ -224,23 +227,23 @@ private void limpiarTabla() {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnVolverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVolverActionPerformed
-MenuAdministrador menu = new MenuAdministrador();
+        MenuAdministrador menu = new MenuAdministrador();
         menu.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_btnVolverActionPerformed
 
     private void btnFinalizadaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFinalizadaActionPerformed
-try {
+        try {
             int fila = txtCitas.getSelectedRow();
             if (fila == -1) {
                 JOptionPane.showMessageDialog(this, "Por favor, seleccione una cita de la tabla.");
                 return;
             }
             int id = Integer.parseInt(txtCitas.getValueAt(fila, 0).toString());
-            
+
             //  URL  /citas/estado/{id}/FINALIZADA
             ApiCliente.put("https://shrubs-calzone-decency.ngrok-free.dev/citas/estado/" + id + "/FINALIZADA");
-            
+
             JOptionPane.showMessageDialog(this, "Cita marcada como Finalizada.");
             cargarCitas();
         } catch (Exception e) {
@@ -250,17 +253,17 @@ try {
     }//GEN-LAST:event_btnFinalizadaActionPerformed
 
     private void btnCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelarActionPerformed
-try {
+        try {
             int fila = txtCitas.getSelectedRow();
             if (fila == -1) {
                 JOptionPane.showMessageDialog(this, "Por favor, seleccione una cita de la tabla.");
                 return;
             }
             int id = Integer.parseInt(txtCitas.getValueAt(fila, 0).toString());
-            
+
             //  URL  /citas/estado/{id}/CANCELADA
             ApiCliente.put("https://shrubs-calzone-decency.ngrok-free.dev/citas/estado/" + id + "/CANCELADA");
-            
+
             JOptionPane.showMessageDialog(this, "Cita Cancelada con éxito.");
             cargarCitas();
         } catch (Exception e) {
@@ -270,17 +273,17 @@ try {
     }//GEN-LAST:event_btnCancelarActionPerformed
 
     private void btnConfirmarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConfirmarActionPerformed
-     try {
+        try {
             int fila = txtCitas.getSelectedRow();
             if (fila == -1) {
                 JOptionPane.showMessageDialog(this, "Por favor, seleccione una cita de la tabla.");
                 return;
             }
             int id = Integer.parseInt(txtCitas.getValueAt(fila, 0).toString());
-            
+
             // /citas/estado/{id}/CONFIRMADA
             ApiCliente.put("https://shrubs-calzone-decency.ngrok-free.dev/citas/estado/" + id + "/CONFIRMADA");
-            
+
             JOptionPane.showMessageDialog(this, "¡Cita Confirmada con éxito!");
             cargarCitas(); // Recargamos la tabla para ver el cambio
         } catch (Exception e) {
